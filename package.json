@@ -1,0 +1,30 @@
+{
+  "name": "@mattermost/compass-tokens",
+  "version": "0.1.0",
+  "description": "Design tokens for the Compass Design System",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'Build scripts coming soon'",
+    "validate": "echo 'Validation scripts coming soon'"
+  },
+  "keywords": [
+    "design-tokens",
+    "design-system",
+    "compass",
+    "mattermost",
+    "tokens",
+    "colors"
+  ],
+  "author": "Mattermost",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mattermost/compass-tokens"
+  },
+  "files": [
+    "tokens/**/*.json",
+    "dist/**/*"
+  ],
+  "devDependencies": {},
+  "dependencies": {}
+}

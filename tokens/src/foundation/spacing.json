@@ -1,0 +1,47 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "spacing": {
+    "foundation": {
+      "xxxxs": {
+        "$type": "dimension",
+        "$value": "4px",
+        "$description": "Extra extra extra extra small spacing (4px)"
+      },
+      "xs": {
+        "$type": "dimension",
+        "$value": "8px",
+        "$description": "Extra small spacing (8px)"
+      },
+      "m": {
+        "$type": "dimension",
+        "$value": "12px",
+        "$description": "Medium spacing (12px)"
+      },
+      "l": {
+        "$type": "dimension",
+        "$value": "16px",
+        "$description": "Large spacing (16px)"
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": "20px",
+        "$description": "Extra large spacing (20px)"
+      },
+      "xxl": {
+        "$type": "dimension",
+        "$value": "24px",
+        "$description": "Extra extra large spacing (24px)"
+      },
+      "xxxl": {
+        "$type": "dimension",
+        "$value": "32px",
+        "$description": "Extra extra extra large spacing (32px)"
+      },
+      "xxxxl": {
+        "$type": "dimension",
+        "$value": "40px",
+        "$description": "Extra extra extra extra large spacing (40px)"
+      }
+    }
+  }
+}

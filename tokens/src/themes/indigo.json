@@ -1,0 +1,114 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "color": {
+    "theme": {
+      "indigo": {
+        "center-channel-bg": {
+          "$type": "color",
+          "$value": "#111827",
+          "$description": "Custom dark indigo background"
+        },
+        "center-channel-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.150}"
+        },
+        "sidebar-bg": {
+          "$type": "color",
+          "$value": "#151E32",
+          "$description": "Custom dark indigo sidebar"
+        },
+        "sidebar-header-bg": {
+          "$type": "color",
+          "$value": "#182339",
+          "$description": "Custom dark indigo header"
+        },
+        "sidebar-text": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "sidebar-text-hover-bg": {
+          "$type": "color",
+          "$value": "#222C3F",
+          "$description": "Custom dark indigo hover"
+        },
+        "sidebar-header-text-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "sidebar-unread-text": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "sidebar-text-active-border": {
+          "$type": "color",
+          "$value": "#4A7CE8",
+          "$description": "Custom blue active border"
+        },
+        "sidebar-text-active-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "sidebar-team-background": {
+          "$type": "color",
+          "$value": "#1C2740",
+          "$description": "Custom dark indigo team background"
+        },
+        "link-color": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.300}"
+        },
+        "button-bg": {
+          "$type": "color",
+          "$value": "#4A7CE8",
+          "$description": "Custom blue button background"
+        },
+        "button-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "online-indicator": {
+          "$type": "color",
+          "$value": "{color.foundation.green.500}"
+        },
+        "away-indicator": {
+          "$type": "color",
+          "$value": "{color.foundation.yellow.500}"
+        },
+        "dnd-indicator": {
+          "$type": "color",
+          "$value": "{color.foundation.red.400}"
+        },
+        "mention-bg": {
+          "$type": "color",
+          "$value": "#4A7CE8",
+          "$description": "Matches button-bg"
+        },
+        "mention-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "mention-highlight-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.700}"
+        },
+        "mention-highlight-link": {
+          "$type": "color",
+          "$value": "{color.foundation.teal.100}"
+        },
+        "error-text": {
+          "$type": "color",
+          "$value": "{color.foundation.red.300}"
+        },
+        "new-message-separator": {
+          "$type": "color",
+          "$value": "{color.foundation.yellow.400}"
+        },
+        "calls-bg": {
+          "$type": "color",
+          "$value": "#222C3F",
+          "$description": "Custom dark indigo calls background"
+        }
+      }
+    }
+  }
+}

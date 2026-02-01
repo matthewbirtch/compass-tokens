@@ -1,0 +1,109 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "color": {
+    "theme": {
+      "quartz": {
+        "center-channel-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "center-channel-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.900}"
+        },
+        "sidebar-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.50}"
+        },
+        "sidebar-header-bg": {
+          "$type": "color",
+          "$value": "#EBECEF",
+          "$description": "Custom light gray value"
+        },
+        "sidebar-text": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.1100}"
+        },
+        "sidebar-text-hover-bg": {
+          "$type": "color",
+          "$value": "#E8EAED",
+          "$description": "Custom light hover value"
+        },
+        "sidebar-header-text-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.1100}"
+        },
+        "sidebar-unread-text": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.1100}"
+        },
+        "sidebar-text-active-border": {
+          "$type": "color",
+          "$value": "{color.foundation.cyan.500}"
+        },
+        "sidebar-text-active-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.1100}"
+        },
+        "sidebar-team-background": {
+          "$type": "color",
+          "$value": "#E5E7EB",
+          "$description": "Custom light team background"
+        },
+        "link-color": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.600}"
+        },
+        "button-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.500}"
+        },
+        "button-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "online-indicator": {
+          "$type": "color",
+          "$value": "{color.foundation.green.500}"
+        },
+        "away-indicator": {
+          "$type": "color",
+          "$value": "{color.foundation.yellow.500}"
+        },
+        "dnd-indicator": {
+          "$type": "color",
+          "$value": "{color.foundation.red.400}"
+        },
+        "mention-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.500}"
+        },
+        "mention-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "mention-highlight-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.teal.200}"
+        },
+        "mention-highlight-link": {
+          "$type": "color",
+          "$value": "{color.foundation.teal.800}"
+        },
+        "error-text": {
+          "$type": "color",
+          "$value": "{color.foundation.red.400}"
+        },
+        "new-message-separator": {
+          "$type": "color",
+          "$value": "{color.foundation.teal.600}"
+        },
+        "calls-bg": {
+          "$type": "color",
+          "$value": "#24272E",
+          "$description": "Custom dark calls background"
+        }
+      }
+    }
+  }
+}

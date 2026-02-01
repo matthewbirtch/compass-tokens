@@ -1,0 +1,37 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "radius": {
+    "foundation": {
+      "xs": {
+        "$type": "dimension",
+        "$value": "2px",
+        "$description": "Extra small radius - subtle rounding for small elements"
+      },
+      "s": {
+        "$type": "dimension",
+        "$value": "4px",
+        "$description": "Small radius - buttons, inputs, small cards"
+      },
+      "m": {
+        "$type": "dimension",
+        "$value": "8px",
+        "$description": "Medium radius - cards, modals, panels"
+      },
+      "l": {
+        "$type": "dimension",
+        "$value": "12px",
+        "$description": "Large radius - large cards, containers"
+      },
+      "xl": {
+        "$type": "dimension",
+        "$value": "16px",
+        "$description": "Extra large radius - prominent containers, hero elements"
+      },
+      "full": {
+        "$type": "dimension",
+        "$value": "50%",
+        "$description": "Full radius - circular elements, pills, fully rounded buttons"
+      }
+    }
+  }
+}
