@@ -15,7 +15,9 @@ tokens/
       color.json        # Foundation color palette (92 colors)
       spacing.json      # Foundation spacing scale (8 sizes)
       radius.json       # Border radius scale (6 sizes)
+      border.json       # Border width, style, emphasis (3 widths, 3 styles, 3 emphasis)
       elevation.json    # Elevation/shadow scale (6 levels)
+      opacity.json      # Opacity scale (12 levels)
       typography.json   # Coming soon
     semantic/
       attachment.json   # Attachment icon colors (file type indicators)
@@ -34,12 +36,15 @@ Foundation tokens are the base-level design decisions - raw color values, spacin
 - `tokens/src/foundation/color.json` - Color palette
 - `tokens/src/foundation/spacing.json` - Spacing scale
 - `tokens/src/foundation/radius.json` - Border radius scale
+- `tokens/src/foundation/border.json` - Border width & style primitives
 - `tokens/src/foundation/elevation.json` - Elevation/shadow scale
+- `tokens/src/foundation/opacity.json` - Opacity scale
 
 ### Semantic Tokens
 Semantic tokens are component-specific tokens that reference foundation tokens but are theme-independent. These provide consistent meaning across all themes.
 
-**Location**: `tokens/src/semantic/attachment.json`
+**Locations**: 
+- `tokens/src/semantic/attachment.json` - Attachment icon colors
 
 Example: Attachment colors for file type icons (blue for documents, green for spreadsheets, etc.)
 
@@ -143,16 +148,18 @@ Foundation spacing tokens provide a consistent spacing scale for layout, padding
 
 | Token | Value | Use Cases |
 |-------|-------|-----------|
-| `xxxxs` | 4px | Tiny gaps, icon padding |
-| `xs` | 8px | Compact spacing, small gaps |
-| `m` | 12px | Medium spacing, form element gaps |
-| `l` | 16px | Standard spacing, card padding |
-| `xl` | 20px | Large spacing, section padding |
-| `xxl` | 24px | Extra large spacing, component separation |
-| `xxxl` | 32px | Section spacing, major layout gaps |
-| `xxxxl` | 40px | Large section spacing, page margins |
+| `xxxxs` | 4 | Tiny gaps, icon padding |
+| `xs` | 8 | Compact spacing, small gaps |
+| `m` | 12 | Medium spacing, form element gaps |
+| `l` | 16 | Standard spacing, card padding |
+| `xl` | 20 | Large spacing, section padding |
+| `xxl` | 24 | Extra large spacing, component separation |
+| `xxxl` | 32 | Section spacing, major layout gaps |
+| `xxxxl` | 40 | Large section spacing, page margins |
 
 The spacing scale is designed to work with common layout patterns and maintain visual rhythm throughout the interface.
+
+**Note**: Values are unitless for cross-platform compatibility. Build tools add platform-specific units (px for web, dp for Android, pt for iOS).
 
 ### Token Format
 
@@ -162,7 +169,7 @@ The spacing scale is designed to work with common layout patterns and maintain v
     "foundation": {
       "l": {
         "$type": "dimension",
-        "$value": "16px"
+        "$value": 16
       }
     }
   }
@@ -177,14 +184,16 @@ Foundation radius tokens provide consistent border-radius values for UI elements
 
 | Token | Value | Use Cases |
 |-------|-------|-----------|
-| `xs` | 2px | Subtle rounding for small elements, badges |
-| `s` | 4px | Buttons, inputs, small cards, chips |
-| `m` | 8px | Cards, modals, panels, tooltips |
-| `l` | 12px | Large cards, containers, sidebars |
-| `xl` | 16px | Prominent containers, hero elements, large modals |
+| `xs` | 2 | Subtle rounding for small elements, badges |
+| `s` | 4 | Buttons, inputs, small cards, chips |
+| `m` | 8 | Cards, modals, panels, tooltips |
+| `l` | 12 | Large cards, containers, sidebars |
+| `xl` | 16 | Prominent containers, hero elements, large modals |
 | `full` | 50% | Circular elements, pills, fully rounded buttons, avatars |
 
 The radius scale provides visual consistency and helps establish the design system's aesthetic.
+
+**Note**: Numeric values are unitless for cross-platform compatibility (except `full` which uses %). Build tools add platform-specific units.
 
 ### Token Format
 
@@ -194,12 +203,79 @@ The radius scale provides visual consistency and helps establish the design syst
     "foundation": {
       "m": {
         "$type": "dimension",
-        "$value": "8px"
+        "$value": 8
       }
     }
   }
 }
 ```
+
+## Border Tokens
+
+### Foundation Border
+
+Foundation border tokens provide primitive values for border width and style:
+
+#### Border Width
+
+| Token | Value | Use Cases |
+|-------|-------|-----------|
+| `thin` | 1 | Standard UI borders, dividers, card edges |
+| `medium` | 2 | Emphasis, selected states, focus rings |
+| `thick` | 4 | Strong emphasis, progress indicators |
+
+#### Border Style
+
+| Token | Value | Use Cases |
+|-------|-------|-----------|
+| `solid` | solid | Standard borders, most UI elements |
+| `dashed` | dashed | Placeholder states, drag zones |
+| `dotted` | dotted | Subtle indicators, decorative elements |
+
+#### Border Emphasis
+
+| Token | Value | Percentage | Use Cases |
+|-------|-------|------------|-----------|
+| `subtle` | 0.08 | 8% | Light dividers, card separators |
+| `default` | 0.12 | 12% | Standard UI element borders |
+| `strong` | 0.16 | 16% | Prominent dividers, focus states, emphasis |
+
+Border emphasis tokens control visual weight by referencing foundation opacity values. Combined with theme colors and border width/style at build time.
+
+### Token Format
+
+```json
+{
+  "border": {
+    "foundation": {
+      "width": {
+        "thin": {
+          "$type": "dimension",
+          "$value": 1
+        }
+      },
+      "style": {
+        "solid": {
+          "$type": "string",
+          "$value": "solid"
+        }
+      },
+      "emphasis": {
+        "default": {
+          "$type": "number",
+          "$value": "{opacity.foundation.12}"
+        }
+      }
+    }
+  }
+}
+```
+
+**Usage**: Combine width + style + theme color + emphasis to create complete border declarations.
+
+**Example**: `border.width.thin` (1) + `border.style.solid` + theme color + `border.emphasis.default` (12%) → `solid 1px rgba(var(--center-channel-color-rgb), 0.12)`
+
+**Note**: Width values are unitless. Build tools add platform-specific units (px, dp, pt) during transformation.
 
 ## Elevation Tokens
 
@@ -227,10 +303,10 @@ Elevation creates visual hierarchy by simulating depth through shadows. Higher n
       "3": {
         "$type": "shadow",
         "$value": {
-          "offsetX": "0px",
-          "offsetY": "6px",
-          "blur": "14px",
-          "spread": "0px",
+          "offsetX": 0,
+          "offsetY": 6,
+          "blur": 14,
+          "spread": 0,
           "color": "#0000001F"
         }
       }
@@ -239,7 +315,49 @@ Elevation creates visual hierarchy by simulating depth through shadows. Higher n
 }
 ```
 
-**CSS Output**: `box-shadow: 0px 6px 14px 0px #0000001F;`
+**CSS Output**: `box-shadow: 0 6px 14px 0 #0000001F;`
+
+**Note**: Shadow offset/blur/spread values are unitless. Build tools add platform-specific units during transformation.
+
+## Opacity Tokens
+
+### Foundation Opacity
+
+Foundation opacity tokens provide a consistent transparency scale used for color variations, overlays, and effects:
+
+| Token | Value | Percentage | Use Cases |
+|-------|-------|------------|-----------|
+| `4` | 0.04 | 4% | Very subtle transparency |
+| `8` | 0.08 | 8% | Light borders, subtle overlays |
+| `12` | 0.12 | 12% | Default borders, elevation shadows |
+| `16` | 0.16 | 16% | Dark borders, hover states |
+| `24` | 0.24 | 24% | Medium transparency |
+| `32` | 0.32 | 32% | Visible transparency |
+| `40` | 0.40 | 40% | Moderate transparency |
+| `48` | 0.48 | 48% | Half transparency |
+| `56` | 0.56 | 56% | Strong transparency |
+| `64` | 0.64 | 64% | Icon opacity, prominent transparency |
+| `75` | 0.75 | 75% | Offline indicator, mostly opaque |
+| `80` | 0.80 | 80% | Icon hover state, high opacity |
+
+These opacity values are used by build tools to generate color variants (e.g., `center-channel-color-8`, `center-channel-color-16`).
+
+### Token Format
+
+```json
+{
+  "opacity": {
+    "foundation": {
+      "12": {
+        "$type": "number",
+        "$value": 0.12
+      }
+    }
+  }
+}
+```
+
+**Usage**: Apply to colors via `rgba()` - e.g., `rgba(var(--center-channel-color-rgb), 0.12)`
 
 ### Token Format
 
@@ -284,7 +402,9 @@ npm install @mattermost/compass-tokens
 import foundationColors from '@mattermost/compass-tokens/tokens/src/foundation/color.json';
 import foundationSpacing from '@mattermost/compass-tokens/tokens/src/foundation/spacing.json';
 import foundationRadius from '@mattermost/compass-tokens/tokens/src/foundation/radius.json';
+import foundationBorder from '@mattermost/compass-tokens/tokens/src/foundation/border.json';
 import foundationElevation from '@mattermost/compass-tokens/tokens/src/foundation/elevation.json';
+import foundationOpacity from '@mattermost/compass-tokens/tokens/src/foundation/opacity.json';
 
 // Access a specific color
 const primaryBlue = foundationColors.color.foundation.blue['500'].$value;
@@ -292,15 +412,27 @@ const primaryBlue = foundationColors.color.foundation.blue['500'].$value;
 
 // Access spacing values
 const standardSpacing = foundationSpacing.spacing.foundation.l.$value;
-// Returns: "16px"
+// Returns: 16
 
 // Access radius values
 const cardRadius = foundationRadius.radius.foundation.m.$value;
-// Returns: "8px"
+// Returns: 8
+
+// Access border primitives
+const borderWidth = foundationBorder.border.foundation.width.thin.$value;
+// Returns: 1
+const borderStyle = foundationBorder.border.foundation.style.solid.$value;
+// Returns: "solid"
+const borderEmphasis = foundationBorder.border.foundation.emphasis.default.$value;
+// Returns: "{opacity.foundation.12}" (reference to foundation opacity)
 
 // Access elevation (box-shadow) values
 const cardElevation = foundationElevation.elevation.foundation['3'].$value;
-// Returns: shadow object with offsetX, offsetY, blur, spread, color
+// Returns: shadow object with offsetX: 0, offsetY: 6, blur: 14, spread: 0, color
+
+// Access opacity values
+const borderOpacity = foundationOpacity.opacity.foundation['12'].$value;
+// Returns: 0.12
 
 // Import semantic tokens (theme-independent)
 import attachmentColors from '@mattermost/compass-tokens/tokens/src/semantic/attachment.json';
@@ -345,16 +477,73 @@ This structure makes it easy to:
 
 Foundation color tokens are extracted from Figma variables and normalized to uppercase HEX format.
 
+### Platform-Agnostic Design
+
+**Unitless Dimension Values**: All dimension tokens (spacing, radius, border width, elevation) use unitless numbers for maximum cross-platform compatibility:
+
+- **Source tokens**: Store pure numbers (e.g., `16`, `8`, `1`)
+- **Build transformation**: Add platform-specific units during build
+
+#### Platform Transformations
+
+| Platform | Example Input | Output | Unit |
+|----------|---------------|--------|------|
+| **Web** | `spacing.l: 16` | `16px` | pixels |
+| **React Native** | `spacing.l: 16` | `16` | density-independent |
+| **iOS** | `spacing.l: 16` | `16pt` | points |
+| **Android** | `spacing.l: 16` | `16dp` | density-independent pixels |
+
+#### Exception: Percentage Values
+
+Relative values like `radius.full: "50%"` keep their units since they're context-dependent.
+
+#### Build Tools
+
+Use tools like [Style Dictionary](https://amzn.github.io/style-dictionary) to transform tokens:
+
+```javascript
+// style-dictionary.config.js
+module.exports = {
+  platforms: {
+    web: {
+      transformGroup: "web",  // Adds 'px' suffix
+      buildPath: "dist/web/",
+      files: [{ destination: "tokens.css", format: "css/variables" }]
+    },
+    reactNative: {
+      transformGroup: "react-native",  // No units
+      buildPath: "dist/rn/",
+      files: [{ destination: "tokens.js", format: "javascript/module" }]
+    }
+  }
+};
+```
+
 ### Future Enhancements
 
-- Build scripts for platform-specific outputs (iOS, Android, Web)
+- Build scripts for platform-specific outputs (iOS, Android, Web, CSS variables)
 - Automatic RGB/RGBA generation with opacity variants
 - Token resolution (convert references to actual values)
 - Typography tokens
-- Spacing tokens
-- Border radius tokens
-- Shadow/elevation tokens
-- Component tokens
+- Additional component tokens
+
+## Rules and Constraints
+
+### For AI Assistants Working with This Token System
+
+**Critical Rules**:
+
+1. **NEVER add units to dimension tokens** - All spacing, radius, border width, and elevation values MUST be unitless numbers (Exception: `radius.full` uses `50%`)
+2. **NEVER create opacity variants in source tokens** - Tokens ending in `-8`, `-16`, `-24`, etc. are generated at build time, not authored
+3. **Colors must be uppercase HEX** - Foundation colors: `#1C58D9` not `#1c58d9`
+4. **Token references use curly braces** - `{color.foundation.blue.500}` not `color.foundation.blue.500`
+5. **Respect the three-tier architecture**:
+   - **Foundation** = primitives (raw values, no references)
+   - **Semantic** = component-specific, theme-independent (may reference foundation)
+   - **Theme** = theme-specific UI tokens (may reference foundation or semantic)
+6. **Follow DTCG format** - All tokens require `$type` and `$value`, optional `$description`
+7. **Border tokens are primitives** - Border width/style/emphasis belong in `foundation/`, not semantic
+8. **Figma is the source of truth** - Extract tokens from Figma variables when adding new foundation tokens
 
 ## Contributing
 

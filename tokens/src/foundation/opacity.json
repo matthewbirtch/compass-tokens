@@ -1,0 +1,67 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "opacity": {
+    "foundation": {
+      "4": {
+        "$type": "number",
+        "$value": 0.04,
+        "$description": "4% opacity - very subtle transparency"
+      },
+      "8": {
+        "$type": "number",
+        "$value": 0.08,
+        "$description": "8% opacity - light borders, subtle overlays"
+      },
+      "12": {
+        "$type": "number",
+        "$value": 0.12,
+        "$description": "12% opacity - default borders, elevation shadows"
+      },
+      "16": {
+        "$type": "number",
+        "$value": 0.16,
+        "$description": "16% opacity - dark borders, hover states"
+      },
+      "24": {
+        "$type": "number",
+        "$value": 0.24,
+        "$description": "24% opacity - medium transparency"
+      },
+      "32": {
+        "$type": "number",
+        "$value": 0.32,
+        "$description": "32% opacity - visible transparency"
+      },
+      "40": {
+        "$type": "number",
+        "$value": 0.40,
+        "$description": "40% opacity - moderate transparency"
+      },
+      "48": {
+        "$type": "number",
+        "$value": 0.48,
+        "$description": "48% opacity - half transparency"
+      },
+      "56": {
+        "$type": "number",
+        "$value": 0.56,
+        "$description": "56% opacity - strong transparency"
+      },
+      "64": {
+        "$type": "number",
+        "$value": 0.64,
+        "$description": "64% opacity - icon opacity, prominent transparency"
+      },
+      "75": {
+        "$type": "number",
+        "$value": 0.75,
+        "$description": "75% opacity - offline indicator, mostly opaque"
+      },
+      "80": {
+        "$type": "number",
+        "$value": 0.80,
+        "$description": "80% opacity - icon hover state, high opacity"
+      }
+    }
+  }
+}

@@ -5,10 +5,10 @@
       "1": {
         "$type": "shadow",
         "$value": {
-          "offsetX": "0px",
-          "offsetY": "2px",
-          "blur": "3px",
-          "spread": "0px",
+          "offsetX": 0,
+          "offsetY": 2,
+          "blur": 3,
+          "spread": 0,
           "color": "#00000014"
         },
         "$description": "Subtle elevation - hover states, small dropdowns"
@@ -16,10 +16,10 @@
       "2": {
         "$type": "shadow",
         "$value": {
-          "offsetX": "0px",
-          "offsetY": "4px",
-          "blur": "6px",
-          "spread": "0px",
+          "offsetX": 0,
+          "offsetY": 4,
+          "blur": 6,
+          "spread": 0,
           "color": "#0000001F"
         },
         "$description": "Low elevation - buttons, chips, small cards"
@@ -27,10 +27,10 @@
       "3": {
         "$type": "shadow",
         "$value": {
-          "offsetX": "0px",
-          "offsetY": "6px",
-          "blur": "14px",
-          "spread": "0px",
+          "offsetX": 0,
+          "offsetY": 6,
+          "blur": 14,
+          "spread": 0,
           "color": "#0000001F"
         },
         "$description": "Medium elevation - cards, menus, tooltips"
@@ -38,10 +38,10 @@
       "4": {
         "$type": "shadow",
         "$value": {
-          "offsetX": "0px",
-          "offsetY": "8px",
-          "blur": "24px",
-          "spread": "0px",
+          "offsetX": 0,
+          "offsetY": 8,
+          "blur": 24,
+          "spread": 0,
           "color": "#0000001F"
         },
         "$description": "High elevation - modals, popovers, floating panels"
@@ -49,10 +49,10 @@
       "5": {
         "$type": "shadow",
         "$value": {
-          "offsetX": "0px",
-          "offsetY": "12px",
-          "blur": "32px",
-          "spread": "0px",
+          "offsetX": 0,
+          "offsetY": 12,
+          "blur": 32,
+          "spread": 0,
           "color": "#0000001F"
         },
         "$description": "Higher elevation - dialogs, drawers"
@@ -60,10 +60,10 @@
       "6": {
         "$type": "shadow",
         "$value": {
-          "offsetX": "0px",
-          "offsetY": "20px",
-          "blur": "32px",
-          "spread": "0px",
+          "offsetX": 0,
+          "offsetY": 20,
+          "blur": 32,
+          "spread": 0,
           "color": "#0000001F"
         },
         "$description": "Highest elevation - full-screen overlays, important modals"

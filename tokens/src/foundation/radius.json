@@ -4,27 +4,27 @@
     "foundation": {
       "xs": {
         "$type": "dimension",
-        "$value": "2px",
+        "$value": 2,
         "$description": "Extra small radius - subtle rounding for small elements"
       },
       "s": {
         "$type": "dimension",
-        "$value": "4px",
+        "$value": 4,
         "$description": "Small radius - buttons, inputs, small cards"
       },
       "m": {
         "$type": "dimension",
-        "$value": "8px",
+        "$value": 8,
         "$description": "Medium radius - cards, modals, panels"
       },
       "l": {
         "$type": "dimension",
-        "$value": "12px",
+        "$value": 12,
         "$description": "Large radius - large cards, containers"
       },
       "xl": {
         "$type": "dimension",
-        "$value": "16px",
+        "$value": 16,
         "$description": "Extra large radius - prominent containers, hero elements"
       },
       "full": {

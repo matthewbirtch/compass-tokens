@@ -1,0 +1,58 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "border": {
+    "foundation": {
+      "width": {
+        "thin": {
+          "$type": "dimension",
+          "$value": 1,
+          "$description": "Thin border - standard UI borders"
+        },
+        "medium": {
+          "$type": "dimension",
+          "$value": 2,
+          "$description": "Medium border - emphasis, focus states"
+        },
+        "thick": {
+          "$type": "dimension",
+          "$value": 4,
+          "$description": "Thick border - strong emphasis"
+        }
+      },
+      "style": {
+        "solid": {
+          "$type": "string",
+          "$value": "solid",
+          "$description": "Solid line"
+        },
+        "dashed": {
+          "$type": "string",
+          "$value": "dashed",
+          "$description": "Dashed line"
+        },
+        "dotted": {
+          "$type": "string",
+          "$value": "dotted",
+          "$description": "Dotted line"
+        }
+      },
+      "emphasis": {
+        "subtle": {
+          "$type": "number",
+          "$value": "{opacity.foundation.8}",
+          "$description": "Subtle border emphasis (8% opacity) - light dividers, card separators"
+        },
+        "default": {
+          "$type": "number",
+          "$value": "{opacity.foundation.12}",
+          "$description": "Default border emphasis (12% opacity) - standard UI element borders"
+        },
+        "strong": {
+          "$type": "number",
+          "$value": "{opacity.foundation.16}",
+          "$description": "Strong border emphasis (16% opacity) - prominent dividers, focus states"
+        }
+      }
+    }
+  }
+}

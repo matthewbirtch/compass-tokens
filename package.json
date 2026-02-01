@@ -1,7 +1,7 @@
 {
   "name": "@mattermost/compass-tokens",
   "version": "0.1.0",
-  "description": "Design tokens for the Compass Design System",
+  "description": "Design tokens for Mattermost's Compass Design System",
   "main": "index.js",
   "scripts": {
     "build": "echo 'Build scripts coming soon'",
