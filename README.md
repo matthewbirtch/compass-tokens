@@ -18,9 +18,10 @@ tokens/
       border.json       # Border width, style, emphasis (3 widths, 3 styles, 3 emphasis)
       elevation.json    # Elevation/shadow scale (6 levels)
       opacity.json      # Opacity scale (12 levels)
-      typography.json   # Coming soon
+      typography.json   # Typography primitives (fontFamily, fontSize, fontWeight, lineHeight, letterSpacing)
     semantic/
       attachment.json   # Attachment icon colors (file type indicators)
+      typography.json   # Typography composite styles (heading, body)
     themes/
       denim.json        # Denim theme (default light with indigo sidebar)
       sapphire.json     # Sapphire theme (light with blue sidebar)
@@ -39,12 +40,14 @@ Foundation tokens are the base-level design decisions - raw color values, spacin
 - `tokens/src/foundation/border.json` - Border width & style primitives
 - `tokens/src/foundation/elevation.json` - Elevation/shadow scale
 - `tokens/src/foundation/opacity.json` - Opacity scale
+- `tokens/src/foundation/typography.json` - Typography primitives
 
 ### Semantic Tokens
 Semantic tokens are component-specific tokens that reference foundation tokens but are theme-independent. These provide consistent meaning across all themes.
 
 **Locations**: 
 - `tokens/src/semantic/attachment.json` - Attachment icon colors
+- `tokens/src/semantic/typography.json` - Typography composite styles
 
 Example: Attachment colors for file type icons (blue for documents, green for spreadsheets, etc.)
 
@@ -359,6 +362,220 @@ These opacity values are used by build tools to generate color variants (e.g., `
 
 **Usage**: Apply to colors via `rgba()` - e.g., `rgba(var(--center-channel-color-rgb), 0.12)`
 
+## Typography Tokens
+
+Typography tokens define the text styles used throughout the Compass Design System. The system uses a **two-layer architecture**: primitive foundation tokens and composite semantic styles.
+
+### Foundation Typography
+
+Foundation typography tokens are primitive values organized by property type:
+
+#### Font Family
+
+| Token | Value | Use Cases |
+|-------|-------|-----------|
+| `heading` | Metropolis + fallbacks | Headings, display text, emphasis |
+| `body` | Open Sans + fallbacks | Body text, UI labels, general content |
+| `mono` | Monaco + fallbacks | Code blocks, technical content |
+
+All font family tokens include comprehensive fallback stacks for cross-platform compatibility.
+
+#### Font Size
+
+| Token | Value | Use Cases |
+|-------|-------|-----------|
+| `25` | 10 | Extra extra small text, micro labels |
+| `50` | 11 | Extra small text, captions |
+| `75` | 12 | Small text, helper text |
+| `100` | 14 | Base body text, UI elements |
+| `200` | 16 | Default body text, comfortable reading |
+| `300` | 18 | Large body text, emphasized content |
+| `400` | 20 | Small headings, subheadings |
+| `500` | 22 | Heading level 3 |
+| `600` | 25 | Heading level 2 |
+| `700` | 28 | Heading level 1 |
+| `800` | 32 | Large section headings |
+| `900` | 36 | Very large headings, page titles |
+| `1000` | 40 | Extra large headings, hero text |
+
+**Note**: Values are unitless for cross-platform compatibility. Build tools add platform-specific units (px, sp, pt).
+
+#### Font Weight
+
+| Token | Value | Use Cases |
+|-------|-------|-----------|
+| `light` | 300 | Subtle text, large display headings |
+| `regular` | 400 | Body text, default UI text |
+| `semibold` | 600 | Emphasis, headings, labels |
+| `bold` | 700 | Strong emphasis, important headings |
+
+#### Line Height
+
+| Token | Value | Use Cases |
+|-------|-------|-----------|
+| `16` | 16 | Extra tight line height for compact text |
+| `20` | 20 | Tight line height for small text |
+| `24` | 24 | Normal line height for body text |
+| `28` | 28 | Relaxed line height for comfortable reading |
+| `30` | 30 | Relaxed line height for medium headings |
+| `36` | 36 | Loose line height for large headings |
+| `40` | 40 | Extra loose line height for large text |
+| `44` | 44 | Extra loose line height for very large text |
+| `48` | 48 | Extra loose line height for hero text |
+
+**Note**: Line height values are absolute dimensions (unitless), not multipliers.
+
+#### Letter Spacing
+
+| Token | Value | Use Cases |
+|-------|-------|-----------|
+| `tight-2` | -2 | Extra tight spacing for large headings |
+| `tight-1` | -1 | Tight spacing for medium headings |
+| `normal` | 0 | Normal spacing for most text |
+| `wide` | 1 | Wide spacing for small caps, labels |
+
+**Note**: Values are unitless (representing px equivalents). Can be negative for tighter tracking.
+
+### Token Format
+
+**Foundation primitives**:
+
+```json
+{
+  "typography": {
+    "foundation": {
+      "fontFamily": {
+        "heading": {
+          "$type": "fontFamily",
+          "$value": ["Metropolis", "-apple-system", "sans-serif"]
+        }
+      },
+      "fontSize": {
+        "200": {
+          "$type": "dimension",
+          "$value": 16
+        }
+      },
+      "fontWeight": {
+        "semibold": {
+          "$type": "fontWeight",
+          "$value": 600
+        }
+      },
+      "lineHeight": {
+        "24": {
+          "$type": "dimension",
+          "$value": 24
+        }
+      },
+      "letterSpacing": {
+        "normal": {
+          "$type": "dimension",
+          "$value": 0
+        }
+      }
+    }
+  }
+}
+```
+
+### Semantic Typography Styles
+
+Semantic typography tokens are **composite tokens** that combine multiple foundation primitives into complete text styles following the DTCG composite token specification.
+
+#### Heading Styles
+
+The system includes multiple heading levels (1000 through 25) with weight variations:
+
+| Token | Font | Size | Weight | Line Height | Use Case |
+|-------|------|------|--------|-------------|----------|
+| `heading.1000` | Metropolis | 40 | 600 | 48 | Hero titles, extra large headings |
+| `heading.900` | Metropolis | 36 | 600 | 44 | Page titles, very large headings |
+| `heading.800` | Metropolis | 32 | 600 | 40 | Section titles, large headings |
+| `heading.700` | Metropolis | 28 | 600 | 36 | H1 - Primary heading |
+| `heading.600` | Metropolis | 25 | 600 | 30 | H2 - Secondary heading |
+| `heading.500` | Metropolis | 22 | 600 | 28 | H3 - Tertiary heading |
+| `heading.400` | Metropolis | 20 | 600 | 28 | H4 - Section heading |
+| `heading.300` | Metropolis | 18 | 600 | 24 | H5 - Subsection heading |
+| `heading.200` | Metropolis | 16 | 600 | 24 | H6 - Small heading |
+| `heading.100` | Open Sans | 14 | 600 | 20 | Small heading, emphasized labels |
+| `heading.75` | Open Sans | 12 | 600 | 16 | Extra small heading |
+| `heading.50` | Open Sans | 11 | 600 | 16 | Smallest heading with wide spacing |
+| `heading.25` | Open Sans | 10 | 600 | 16 | Micro heading, all-caps labels |
+
+**Weight Variations**: Most heading levels also include `-regular` and `-light` variations (e.g., `heading.800-regular`, `heading.900-light`).
+
+#### Body Text Styles
+
+| Token | Font | Size | Weight | Line Height | Use Case |
+|-------|------|------|--------|-------------|----------|
+| `body.300` | Open Sans | 18 | 400 | 28 | Large body text |
+| `body.200` | Open Sans | 16 | 400 | 24 | Default body text |
+| `body.100` | Open Sans | 14 | 400 | 20 | Base body text, UI elements |
+| `body.75` | Open Sans | 12 | 400 | 16 | Small text, helper text |
+| `body.50` | Open Sans | 11 | 400 | 16 | Extra small text, captions |
+| `body.25` | Open Sans | 10 | 400 | 16 | Smallest text, micro copy |
+
+**Weight Variations**: All body text levels include `-semibold` variations (e.g., `body.200-semibold`, `body.100-semibold`).
+
+### Composite Token Format
+
+Composite typography tokens follow the DTCG specification and reference foundation primitives:
+
+```json
+{
+  "typography": {
+    "semantic": {
+      "heading": {
+        "700": {
+          "$type": "typography",
+          "$description": "Heading level 1 - primary heading",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.700}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.36}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        }
+      },
+      "body": {
+        "200": {
+          "$type": "typography",
+          "$description": "Default body text",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.200}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.24}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+**Key Benefits of Composite Tokens**:
+- Single source of truth for complete text styles
+- Consistent application across platforms
+- Easy to update multiple properties at once
+- References foundation primitives for flexibility
+
+### Cross-Platform Typography
+
+Typography tokens use unitless values for maximum cross-platform compatibility:
+
+| Platform | Font Size Transform | Line Height Transform | Letter Spacing Transform |
+|----------|-------------------|---------------------|------------------------|
+| **Web (CSS)** | `16` → `16px` | `24` → `24px` | `0` → `0px` |
+| **React Native** | `16` → `16` | `24` → `24` | `0` → `0` |
+| **iOS (Swift)** | `16` → `16pt` | `24` → `24pt` | `0` → `0pt` |
+| **Android (Kotlin)** | `16` → `16sp` | `24` → `24dp` | `0` → `0dp` |
+
+Build tools (like Style Dictionary) automatically add platform-specific units during transformation.
+
 ### Token Format
 
 All tokens follow the DTCG format:
@@ -405,6 +622,7 @@ import foundationRadius from '@mattermost/compass-tokens/tokens/src/foundation/r
 import foundationBorder from '@mattermost/compass-tokens/tokens/src/foundation/border.json';
 import foundationElevation from '@mattermost/compass-tokens/tokens/src/foundation/elevation.json';
 import foundationOpacity from '@mattermost/compass-tokens/tokens/src/foundation/opacity.json';
+import foundationTypography from '@mattermost/compass-tokens/tokens/src/foundation/typography.json';
 
 // Access a specific color
 const primaryBlue = foundationColors.color.foundation.blue['500'].$value;
@@ -434,12 +652,33 @@ const cardElevation = foundationElevation.elevation.foundation['3'].$value;
 const borderOpacity = foundationOpacity.opacity.foundation['12'].$value;
 // Returns: 0.12
 
+// Access typography primitives
+const headingFont = foundationTypography.typography.foundation.fontFamily.heading.$value;
+// Returns: ["Metropolis", "-apple-system", "BlinkMacSystemFont", "sans-serif"]
+const baseFontSize = foundationTypography.typography.foundation.fontSize['100'].$value;
+// Returns: 14
+const semiboldWeight = foundationTypography.typography.foundation.fontWeight.semibold.$value;
+// Returns: 600
+
 // Import semantic tokens (theme-independent)
 import attachmentColors from '@mattermost/compass-tokens/tokens/src/semantic/attachment.json';
+import semanticTypography from '@mattermost/compass-tokens/tokens/src/semantic/typography.json';
 
 // Access attachment colors for file type indicators
 const docColor = attachmentColors.color.semantic.attachment.blue.$value;
 // Returns: "{color.foundation.blue.300}" (reference to foundation token)
+
+// Access semantic typography styles (composite tokens)
+const h1Style = semanticTypography.typography.semantic.heading['700'].$value;
+// Returns: {
+//   fontFamily: "{typography.foundation.fontFamily.primary}",
+//   fontSize: "{typography.foundation.fontSize.700}",
+//   fontWeight: "{typography.foundation.fontWeight.semibold}",
+//   lineHeight: "{typography.foundation.lineHeight.36}",
+//   letterSpacing: "{typography.foundation.letterSpacing.normal}"
+// }
+const bodyStyle = semanticTypography.typography.semantic.body['200'].$value;
+// Returns: composite typography object with all text properties
 
 // Import theme tokens (any theme)
 import denimTheme from '@mattermost/compass-tokens/tokens/src/themes/denim.json';
@@ -524,7 +763,6 @@ module.exports = {
 - Build scripts for platform-specific outputs (iOS, Android, Web, CSS variables)
 - Automatic RGB/RGBA generation with opacity variants
 - Token resolution (convert references to actual values)
-- Typography tokens
 - Additional component tokens
 
 ## Rules and Constraints
@@ -533,7 +771,7 @@ module.exports = {
 
 **Critical Rules**:
 
-1. **NEVER add units to dimension tokens** - All spacing, radius, border width, and elevation values MUST be unitless numbers (Exception: `radius.full` uses `50%`)
+1. **NEVER add units to dimension tokens** - All spacing, radius, border width, elevation, and typography dimension values (fontSize, lineHeight, letterSpacing) MUST be unitless numbers (Exception: `radius.full` uses `50%`)
 2. **NEVER create opacity variants in source tokens** - Tokens ending in `-8`, `-16`, `-24`, etc. are generated at build time, not authored
 3. **Colors must be uppercase HEX** - Foundation colors: `#1C58D9` not `#1c58d9`
 4. **Token references use curly braces** - `{color.foundation.blue.500}` not `color.foundation.blue.500`
@@ -544,6 +782,10 @@ module.exports = {
 6. **Follow DTCG format** - All tokens require `$type` and `$value`, optional `$description`
 7. **Border tokens are primitives** - Border width/style/emphasis belong in `foundation/`, not semantic
 8. **Figma is the source of truth** - Extract tokens from Figma variables when adding new foundation tokens
+9. **Typography dimension values MUST be unitless** - fontSize, lineHeight, letterSpacing values are pure numbers without `px`, `pt`, or `sp` units
+10. **fontWeight MUST use numeric values** - Use `400`, `600`, `700` (not `"normal"`, `"semibold"`, `"bold"`) for better cross-platform precision
+11. **fontFamily MUST be an array with fallbacks** - Always provide fallback fonts: `["Metropolis", "-apple-system", "sans-serif"]`
+12. **Composite typography tokens MUST reference foundation tokens** - Semantic typography styles should reference foundation primitives, not use direct values
 
 ## Contributing
 

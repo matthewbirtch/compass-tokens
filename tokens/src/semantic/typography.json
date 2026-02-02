@@ -1,0 +1,418 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "typography": {
+    "semantic": {
+      "heading": {
+        "1000": {
+          "$type": "typography",
+          "$description": "Extra large heading - hero titles",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.1000}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.48}",
+            "letterSpacing": "{typography.foundation.letterSpacing.tight-2}"
+          }
+        },
+        "1000-regular": {
+          "$type": "typography",
+          "$description": "Extra large heading with regular weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.1000}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.48}",
+            "letterSpacing": "{typography.foundation.letterSpacing.tight-2}"
+          }
+        },
+        "1000-light": {
+          "$type": "typography",
+          "$description": "Extra large heading with light weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.1000}",
+            "fontWeight": "{typography.foundation.fontWeight.light}",
+            "lineHeight": "{typography.foundation.lineHeight.48}",
+            "letterSpacing": "{typography.foundation.letterSpacing.tight-2}"
+          }
+        },
+        "900": {
+          "$type": "typography",
+          "$description": "Very large heading - page titles",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.900}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.44}",
+            "letterSpacing": "{typography.foundation.letterSpacing.tight-2}"
+          }
+        },
+        "900-regular": {
+          "$type": "typography",
+          "$description": "Very large heading with regular weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.900}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.44}",
+            "letterSpacing": "{typography.foundation.letterSpacing.tight-2}"
+          }
+        },
+        "900-light": {
+          "$type": "typography",
+          "$description": "Very large heading with light weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.900}",
+            "fontWeight": "{typography.foundation.fontWeight.light}",
+            "lineHeight": "{typography.foundation.lineHeight.44}",
+            "letterSpacing": "{typography.foundation.letterSpacing.tight-2}"
+          }
+        },
+        "800": {
+          "$type": "typography",
+          "$description": "Large heading - section titles",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.800}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.40}",
+            "letterSpacing": "{typography.foundation.letterSpacing.tight-1}"
+          }
+        },
+        "800-regular": {
+          "$type": "typography",
+          "$description": "Large heading with regular weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.800}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.40}",
+            "letterSpacing": "{typography.foundation.letterSpacing.tight-1}"
+          }
+        },
+        "800-light": {
+          "$type": "typography",
+          "$description": "Large heading with light weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.800}",
+            "fontWeight": "{typography.foundation.fontWeight.light}",
+            "lineHeight": "{typography.foundation.lineHeight.40}",
+            "letterSpacing": "{typography.foundation.letterSpacing.tight-1}"
+          }
+        },
+        "700": {
+          "$type": "typography",
+          "$description": "Heading level 1 - primary heading",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.700}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.36}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "700-regular": {
+          "$type": "typography",
+          "$description": "Heading level 1 with regular weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.700}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.36}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "600": {
+          "$type": "typography",
+          "$description": "Heading level 2",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.600}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.30}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "600-regular": {
+          "$type": "typography",
+          "$description": "Heading level 2 with regular weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.600}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.30}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "500": {
+          "$type": "typography",
+          "$description": "Heading level 3",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.500}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.28}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "500-regular": {
+          "$type": "typography",
+          "$description": "Heading level 3 with regular weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.500}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.28}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "400": {
+          "$type": "typography",
+          "$description": "Heading level 4",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.400}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.28}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "400-regular": {
+          "$type": "typography",
+          "$description": "Heading level 4 with regular weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.400}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.28}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "300": {
+          "$type": "typography",
+          "$description": "Heading level 5",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.300}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.24}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "300-regular": {
+          "$type": "typography",
+          "$description": "Heading level 5 with regular weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.300}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.24}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "200": {
+          "$type": "typography",
+          "$description": "Heading level 6",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.200}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.24}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "200-regular": {
+          "$type": "typography",
+          "$description": "Heading level 6 with regular weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.heading}",
+            "fontSize": "{typography.foundation.fontSize.200}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.24}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "100": {
+          "$type": "typography",
+          "$description": "Small heading",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.100}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.20}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "75": {
+          "$type": "typography",
+          "$description": "Extra small heading",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.75}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.16}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "50": {
+          "$type": "typography",
+          "$description": "Smallest heading with wide spacing",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.50}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.16}",
+            "letterSpacing": "{typography.foundation.letterSpacing.wide}"
+          }
+        },
+        "25": {
+          "$type": "typography",
+          "$description": "Smallest heading with wide spacing",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.25}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.16}",
+            "letterSpacing": "{typography.foundation.letterSpacing.wide}"
+          }
+        }
+      },
+      "body": {
+        "300": {
+          "$type": "typography",
+          "$description": "Large body text",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.300}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.28}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "300-semibold": {
+          "$type": "typography",
+          "$description": "Large body text with semibold weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.300}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.28}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "200": {
+          "$type": "typography",
+          "$description": "Default body text",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.200}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.24}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "200-semibold": {
+          "$type": "typography",
+          "$description": "Default body text with semibold weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.200}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.24}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "100": {
+          "$type": "typography",
+          "$description": "Base body text",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.100}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.20}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "100-semibold": {
+          "$type": "typography",
+          "$description": "Base body text with semibold weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.100}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.20}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "75": {
+          "$type": "typography",
+          "$description": "Small body text",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.75}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.16}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "75-semibold": {
+          "$type": "typography",
+          "$description": "Small body text with semibold weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.75}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.16}",
+            "letterSpacing": "{typography.foundation.letterSpacing.normal}"
+          }
+        },
+        "50": {
+          "$type": "typography",
+          "$description": "Extra small body text",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.50}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.16}",
+            "letterSpacing": "{typography.foundation.letterSpacing.wide}"
+          }
+        },
+        "50-semibold": {
+          "$type": "typography",
+          "$description": "Extra small body text with semibold weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.50}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.16}",
+            "letterSpacing": "{typography.foundation.letterSpacing.wide}"
+          }
+        },
+        "25": {
+          "$type": "typography",
+          "$description": "Smallest body text",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.25}",
+            "fontWeight": "{typography.foundation.fontWeight.regular}",
+            "lineHeight": "{typography.foundation.lineHeight.16}",
+            "letterSpacing": "{typography.foundation.letterSpacing.wide}"
+          }
+        },
+        "25-semibold": {
+          "$type": "typography",
+          "$description": "Smallest body text with semibold weight",
+          "$value": {
+            "fontFamily": "{typography.foundation.fontFamily.body}",
+            "fontSize": "{typography.foundation.fontSize.25}",
+            "fontWeight": "{typography.foundation.fontWeight.semibold}",
+            "lineHeight": "{typography.foundation.lineHeight.16}",
+            "letterSpacing": "{typography.foundation.letterSpacing.wide}"
+          }
+        }
+      }
+    }
+  }
+}
