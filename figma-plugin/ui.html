@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Compass Token Sync</title>
+  <link rel="stylesheet" href="ui.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>🎨 Compass Token Sync</h1>
+      <p class="subtitle">Sync foundation colors to GitHub</p>
+    </div>
+
+    <!-- Status Section -->
+    <div id="status-section" class="section">
+      <div class="status-card">
+        <div class="status-indicator" id="status-indicator">
+          <span id="status-icon">⚪</span>
+          <span id="status-text">Loading...</span>
+        </div>
+        <div class="last-sync" id="last-sync">
+          Last sync: Never
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Action -->
+    <div class="section">
+      <button id="sync-button" class="primary-button" disabled>
+        <span id="sync-button-text">Sync to GitHub</span>
+      </button>
+      
+      <button id="save-local-button" class="secondary-button">
+        💾 Save JSON Locally
+      </button>
+    </div>
+
+    <!-- Progress/Results -->
+    <div id="progress-section" class="section" style="display: none;">
+      <div class="progress-card">
+        <div id="progress-message">Processing...</div>
+        <div id="progress-details"></div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <details class="section">
+      <summary>⚙️ Settings</summary>
+      <div class="settings-content">
+        <label for="github-token">GitHub Personal Access Token</label>
+        <input 
+          type="password" 
+          id="github-token" 
+          placeholder="ghp_..." 
+          autocomplete="off"
+        />
+        <div class="button-group">
+          <button id="save-token-button" class="small-button">Save Token</button>
+          <button id="clear-token-button" class="small-button danger">Clear Token</button>
+        </div>
+        <p class="help-text">
+          Token is stored securely in Figma and never leaves your computer.
+          <br><br>
+          <strong>Required scope:</strong> <code>repo</code> (full repository access)
+          <br><br>
+          Create at: <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a>
+        </p>
+      </div>
+    </details>
+
+    <!-- Info -->
+    <details class="section">
+      <summary>ℹ️ What Gets Synced</summary>
+      <div class="info-content">
+        <p><strong>Synced:</strong></p>
+        <ul>
+          <li>✅ Foundation colors only</li>
+          <li>✅ Pattern: <code>blue/500</code>, <code>neutral/1000</code></li>
+          <li>✅ 10 color families × 8-25 shades</li>
+        </ul>
+        
+        <p><strong>Not synced:</strong></p>
+        <ul>
+          <li>❌ Theme variables (Denim/Button BG)</li>
+          <li>❌ Attachment colors (attachment-blue)</li>
+          <li>❌ Typography variables</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <script>
+    let hasToken = false;
+    let lastSync = null;
+
+    // Update status display
+    function updateStatus(has Token, sync) {
+      hasToken = hasToken;
+      lastSync = sync;
+      
+      const indicator = document.getElementById('status-indicator');
+      const icon = document.getElementById('status-icon');
+      const text = document.getElementById('status-text');
+      const syncButton = document.getElementById('sync-button');
+      const lastSyncEl = document.getElementById('last-sync');
+      
+      if (hasToken) {
+        icon.textContent = '✅';
+        text.textContent = 'Ready to sync';
+        syncButton.disabled = false;
+      } else {
+        icon.textContent = '⚠️';
+        text.textContent = 'Configure token in Settings';
+        syncButton.disabled = true;
+      }
+      
+      if (sync) {
+        const date = new Date(sync);
+        lastSyncEl.textContent = `Last sync: ${date.toLocaleString()}`;
+      } else {
+        lastSyncEl.textContent = 'Last sync: Never';
+      }
+    }
+
+    // Show progress
+    function showProgress(message, details = '') {
+      const section = document.getElementById('progress-section');
+      const messageEl = document.getElementById('progress-message');
+      const detailsEl = document.getElementById('progress-details');
+      
+      section.style.display = 'block';
+      messageEl.textContent = message;
+      detailsEl.textContent = details;
+    }
+
+    // Hide progress
+    function hideProgress() {
+      document.getElementById('progress-section').style.display = 'none';
+    }
+
+    // Show error
+    function showError(message) {
+      showProgress('❌ Error', message);
+      setTimeout(hideProgress, 5000);
+    }
+
+    // Show success
+    function showSuccess(message) {
+      showProgress('✅ Success!', message);
+      setTimeout(hideProgress, 3000);
+    }
+
+    // Handle sync to GitHub
+    document.getElementById('sync-button').onclick = () => {
+      if (!hasToken) {
+        showError('Please configure GitHub token in Settings first');
+        return;
+      }
+      
+      showProgress('Syncing to GitHub...', 'Extracting colors from Figma...');
+      parent.postMessage({ pluginMessage: { type: 'sync-to-github' } }, '*');
+    };
+
+    // Handle save locally
+    document.getElementById('save-local-button').onclick = () => {
+      showProgress('Exporting colors...', 'Extracting colors from Figma...');
+      parent.postMessage({ pluginMessage: { type: 'save-locally' } }, '*');
+    };
+
+    // Handle save token
+    document.getElementById('save-token-button').onclick = () => {
+      const token = document.getElementById('github-token').value.trim();
+      if (!token) {
+        showError('Please enter a token');
+        return;
+      }
+      
+      parent.postMessage({ 
+        pluginMessage: { 
+          type: 'save-github-token',
+          token: token
+        } 
+      }, '*');
+    };
+
+    // Handle clear token
+    document.getElementById('clear-token-button').onclick = () => {
+      if (confirm('Are you sure you want to clear the saved token?')) {
+        document.getElementById('github-token').value = '';
+        parent.postMessage({ pluginMessage: { type: 'clear-github-token' } }, '*');
+      }
+    };
+
+    // Handle messages from plugin
+    onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      
+      switch (msg.type) {
+        case 'init':
+        case 'status':
+          updateStatus(msg.data.hasToken, msg.data.lastSync);
+          hideProgress();
+          break;
+        
+        case 'sync-started':
+          showProgress('Syncing...', 'Extracting colors from Figma...');
+          break;
+        
+        case 'extracted':
+          showProgress(
+            'Colors extracted!',
+            `Processed ${msg.data.processed} colors from ${msg.data.families} families`
+          );
+          break;
+        
+        case 'sync-success':
+          showSuccess(
+            `Successfully synced ${msg.data.colorCount} colors! Pull request created on GitHub.`
+          );
+          updateStatus(true, msg.data.timestamp);
+          break;
+        
+        case 'saved-locally':
+          showSuccess(
+            `Exported ${msg.data.processed} colors. Check your downloads folder for color.json`
+          );
+          break;
+        
+        case 'token-saved':
+          showSuccess('GitHub token saved successfully!');
+          updateStatus(true, lastSync);
+          break;
+        
+        case 'token-cleared':
+          showSuccess('GitHub token cleared');
+          updateStatus(false, lastSync);
+          break;
+        
+        case 'download':
+          // Create download link
+          const blob = new Blob([msg.data.content], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = msg.data.filename;
+          a.click();
+          URL.revokeObjectURL(url);
+          break;
+        
+        case 'error':
+          showError(msg.error);
+          break;
+      }
+    };
+
+    // Request initial status
+    parent.postMessage({ pluginMessage: { type: 'get-status' } }, '*');
+  </script>
+</body>
+</html>

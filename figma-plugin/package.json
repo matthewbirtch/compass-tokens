@@ -1,0 +1,13 @@
+{
+  "name": "compass-token-sync-plugin",
+  "version": "1.0.0",
+  "description": "Sync foundation color tokens from Figma to GitHub",
+  "scripts": {
+    "build": "tsc && cp ui.html dist/ && cp ui.css dist/",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.91.0",
+    "typescript": "^5.3.3"
+  }
+}

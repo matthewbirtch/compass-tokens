@@ -6,7 +6,7 @@
   "scripts": {
     "build": "echo 'Build scripts coming soon'",
     "validate": "node scripts/validate-tokens.js",
-    "sync:figma": "node scripts/sync-from-figma.js"
+    "plugin:build": "cd figma-plugin && npm run build"
   },
   "keywords": [
     "design-tokens",
@@ -26,8 +26,6 @@
     "tokens/**/*.json",
     "dist/**/*"
   ],
-  "devDependencies": {
-    "dotenv": "^16.4.5"
-  },
+  "devDependencies": {},
   "dependencies": {}
 }

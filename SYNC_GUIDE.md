@@ -2,68 +2,59 @@
 
 ## 🎯 What You Have
 
-A CLI tool that syncs foundation color tokens from Figma to this repository!
+A **Figma plugin** that syncs foundation color tokens from Figma to this repository!
 
-**Command**: `npm run sync:figma`
-
-**What it does**:
-- ✅ Fetches colors from Figma API
+**How it works**:
+- ✅ Runs inside Figma Desktop (no API token needed!)
+- ✅ Direct access to your color variables
 - ✅ Transforms to DTCG format (uppercase HEX)
 - ✅ Validates against project rules
-- ✅ Updates color.json
-- ✅ Creates PR automatically
+- ✅ Creates PR automatically on GitHub
 
 ---
 
 ## 🚀 Setup Instructions
 
-### **Step 1: Install Dependencies**
+### **Step 1: Install Plugin Dependencies**
 
 ```bash
+cd figma-plugin
 npm install
 ```
 
-### **Step 2: Create Figma Personal Access Token**
-
-1. Open Figma → **Settings** → **Account**
-2. Scroll to **Personal Access Tokens**
-3. Click **"Generate new token"**
-4. Name it: `"Compass Token Sync"`
-5. Click **"Generate"**
-6. **Copy the token** (you won't see it again!)
-
-### **Step 3: Get Your Figma File ID**
-
-From your Figma URL:
-```
-https://figma.com/design/ABC123XYZ/Colors
-                        ↑↑↑↑↑↑↑↑↑
-                     This is your File ID
-```
-
-### **Step 4: Create .env File**
+### **Step 2: Build the Plugin**
 
 ```bash
-cp .env.example .env
+npm run build
 ```
 
-Edit `.env` and paste your values:
+This creates the `dist/` folder with the compiled plugin.
 
-```bash
-FIGMA_API_TOKEN=figd_YOUR_TOKEN_HERE
-FIGMA_FILE_ID=ABC123XYZ
-```
+### **Step 3: Load Plugin in Figma Desktop**
 
-### **Step 5: Install GitHub CLI (Optional)**
+1. Open **Figma Desktop** (not browser!)
+2. Go to **Plugins** → **Development** → **Import plugin from manifest...**
+3. Navigate to and select: `figma-plugin/manifest.json`
+4. Plugin is now loaded!
 
-For automatic PR creation:
+### **Step 4: Create GitHub Personal Access Token**
 
-```bash
-brew install gh
-gh auth login
-```
+1. Go to https://github.com/settings/tokens
+2. Click **"Generate new token (classic)"**
+3. Name: `"Figma Plugin Sync"`
+4. **Required scope**: ☑️ **`repo`** (full repository access)
+5. Expiry: **90 days** (recommended)
+6. Click **"Generate token"**
+7. **Copy the token immediately** (you won't see it again!)
 
-Follow the prompts to authenticate.
+### **Step 5: Configure Plugin**
+
+1. In Figma, open your color library file
+2. **Right-click** → **Plugins** → **Development** → **Compass Token Sync**
+3. Plugin opens! Click **"⚙️ Settings"**
+4. Paste your GitHub token
+5. Click **"Save Token"**
+6. Status should show: **"✅ Ready to sync"**
 
 ---
 
@@ -72,163 +63,184 @@ Follow the prompts to authenticate.
 ### **Normal Workflow**
 
 1. **Edit colors in Figma**
-2. **Publish your Figma library** (standard workflow)
-3. **Run the sync**:
-   ```bash
-   npm run sync:figma
-   ```
-4. **Review the PR** that was auto-created
-5. **Merge** when ready!
+   - Make your color changes
+   - Test in your designs
 
-### **What You'll See**
+2. **Publish your Figma library** 
+   - Standard Figma workflow
+   - Ensures changes are finalized
+
+3. **Open the plugin**
+   - Right-click → Plugins → Compass Token Sync
+   - (or use Quick Actions: Cmd/Ctrl + /)
+
+4. **Click "Sync to GitHub"**
+   - Plugin extracts colors
+   - Creates PR on GitHub
+   - Shows success message with PR link
+
+5. **Review & Merge the PR**
+   - Check the diff on GitHub
+   - Merge when ready!
+
+### **What You'll See in the Plugin**
 
 ```
-============================================================
-FIGMA TOKEN SYNC
-============================================================
+🎨 Compass Token Sync
+Sync foundation colors to GitHub
 
-1️⃣  Checking environment...
-   ✓ Environment configured
+Status:
+✅ Ready to sync
+Last sync: 2/8/2026, 4:30 PM
 
-2️⃣  Checking GitHub CLI...
-   ✓ GitHub CLI authenticated
+[Sync to GitHub Button]
+[💾 Save JSON Locally Button]
 
-3️⃣  Fetching variables from Figma...
-   File ID: ABC123XYZ
-   ✓ Successfully fetched data from Figma
-
-4️⃣  Extracting foundation colors...
-   ✓ Found 92 foundation color variables
-
-5️⃣  Transforming to DTCG format...
-
-   Color Summary:
-     • blue: 8 shades
-     • indigo: 8 shades
-     • neutral: 25 shades
-     • cyan: 8 shades
-     • purple: 8 shades
-     • teal: 8 shades
-     • yellow: 8 shades
-     • orange: 8 shades
-     • green: 8 shades
-     • red: 8 shades
-
-6️⃣  Validating tokens...
-   ✓ Validation passed
-
-7️⃣  Writing to color.json...
-   ✓ Updated tokens/src/foundation/color.json
-
-8️⃣  Checking for changes...
-   ✓ Changes detected
-
-9️⃣  Creating branch and committing...
-   ✓ Created branch: figma-sync-20260208
-   ✓ Created commit
-   ✓ Pushed to remote
-
-🔟 Creating pull request...
-   ✓ Created Pull Request:
-     https://github.com/mattermost/compass-tokens/pull/123
-
-============================================================
-✅ SYNC COMPLETE
-============================================================
+⚙️ Settings (click to expand)
+ℹ️ What Gets Synced (click to expand)
 ```
-
----
-
-## 🛠 Troubleshooting
-
-### **"FIGMA_API_TOKEN is not set"**
-
-You need to create a `.env` file:
-```bash
-cp .env.example .env
-```
-
-Then edit it with your credentials.
-
-### **"Invalid Figma API token"**
-
-Double-check your token in `.env`. Make sure you copied it correctly when you generated it.
-
-### **"Figma file not found"**
-
-Check your `FIGMA_FILE_ID` in `.env`. Get it from your Figma URL.
-
-### **"No foundation colors found"**
-
-The script only syncs variables matching this pattern:
-- `blue/500`, `neutral/1000`, `red/400`, etc.
-
-It skips:
-- Theme variables (`Denim/Button BG`)
-- Attachment colors (`attachment-blue`)
-- Capitalized variants (`Blue/500`)
-
-### **"GitHub CLI not found"**
-
-You can still use the tool! It will update `color.json` locally.
-
-Then commit manually:
-```bash
-git add tokens/src/foundation/color.json
-git commit -m "chore: sync foundation colors from Figma"
-git push
-```
-
----
-
-## ✅ Validation
-
-Test your tokens anytime:
-
-```bash
-npm run validate
-```
-
-This checks:
-- HEX values are uppercase
-- DTCG schema is valid
-- No opacity variants in source
-- All expected color families present
 
 ---
 
 ## 🎨 What Gets Synced
 
-**Synced** (foundation colors):
+**Foundation colors only**:
 - ✅ `blue/100` through `blue/800`
-- ✅ `indigo/100` through `indigo/800`  
+- ✅ `indigo/100` through `indigo/800`
 - ✅ `neutral/0` through `neutral/1200`
-- ✅ All other color families: cyan, purple, teal, yellow, orange, green, red
+- ✅ All families: cyan, purple, teal, yellow, orange, green, red
 
-**Not Synced**:
+**Pattern**: `colorFamily/shade` (e.g., `blue/500`, `neutral/1000`)
+
+**Not synced**:
 - ❌ Theme variables (e.g., `Denim/Button BG`)
-- ❌ Semantic colors (e.g., `attachment-blue`)
-- ❌ Capitalized display variants (e.g., `Blue/500`)
+- ❌ Attachment colors (e.g., `attachment-blue`)
+- ❌ Capitalized variants (e.g., `Blue/500`)
 - ❌ Typography variables
+
+---
+
+## 🛠 Troubleshooting
+
+### **Plugin doesn't appear in Figma**
+
+1. Make sure you're using **Figma Desktop** (not browser)
+2. Check you ran `npm run build` in `figma-plugin/`
+3. Check `figma-plugin/dist/` folder exists
+4. Try: Plugins → Development → **Remove plugin**, then re-import
+
+### **"Configure token in Settings"**
+
+You need to add your GitHub Personal Access Token:
+1. Open plugin
+2. Click "⚙️ Settings"
+3. Paste your token
+4. Click "Save Token"
+
+### **"GitHub API error (401)"**
+
+Your token is invalid or expired:
+1. Generate a new token (see Step 4 above)
+2. Update in plugin settings
+
+### **"GitHub API error (403)"**
+
+Your token doesn't have the `repo` scope:
+1. Generate a new token
+2. Make sure to check ☑️ **`repo`**
+3. Update in plugin settings
+
+### **"GitHub API error (404)"**
+
+The repository doesn't exist or token doesn't have access:
+- Make sure you have access to `mattermost/compass-tokens`
+- Check token has `repo` scope
+
+### **No colors found / "Found 0 foundation color variables"**
+
+Check your variable naming:
+- Variables must match pattern: `blue/500`, `neutral/1000`
+- Must be lowercase (not `Blue/500`)
+- Only processes COLOR type variables
+
+### **Plugin shows "No changes detected"**
+
+Your Figma colors already match the repository - everything is in sync! ✅
+
+To test:
+1. Make a small color change
+2. Try syncing again
+
+---
+
+## 💾 Alternative: Save Locally
+
+If you don't want auto PR creation:
+
+1. Click **"💾 Save JSON Locally"**
+2. Plugin downloads `color.json` file
+3. Manually copy to `tokens/src/foundation/color.json`
+4. Commit and push yourself:
+   ```bash
+   git add tokens/src/foundation/color.json
+   git commit -m "chore: sync foundation colors from Figma"
+   git push
+   ```
 
 ---
 
 ## 🔐 Security
 
-- Your Figma token is stored in `.env` (not committed to git)
-- Token is only used to read variables (read-only access)
-- You can revoke it anytime from Figma settings
-- All changes go through PR review before merging
+- **Token storage**: Stored in Figma's client storage (local to your machine, never transmitted except to GitHub)
+- **Token permissions**: Only needs `repo` scope (read/write repository access)
+- **Revoke anytime**: https://github.com/settings/tokens
+- **PR review**: All changes reviewed via pull request before merging
+- **No API**: Plugin doesn't use Figma REST API (runs inside Figma, direct variable access)
 
 ---
 
-## 📚 Need Help?
+## 🔄 Development Workflow
 
-1. Check this guide
-2. Run `npm run validate` to check current state
-3. Review the [main README](README.md) for full documentation
-4. Check the [plan document](.cursor/plans/) for architecture details
+### Making Changes to the Plugin
+
+1. Edit `code.ts`, `ui.html`, or `ui.css`
+2. Run `npm run build`
+3. In Figma: **Plugins** → **Development** → **Reload plugin** (or Cmd/Ctrl + Option/Alt + P)
+4. Test your changes
+
+### Watch Mode (Auto-rebuild)
+
+```bash
+npm run watch
+```
+
+Automatically rebuilds when you save changes (still need to reload in Figma).
 
 ---
 
-**Ready?** Run `npm run sync:figma` to sync your first colors! 🚀
+## 📚 Additional Resources
+
+- **Plugin README**: `figma-plugin/README.md` (detailed technical docs)
+- **Main README**: `README.md` (full token system documentation)
+- **Validation**: Run `npm run validate` to check token format
+- **Figma Plugin Docs**: https://www.figma.com/plugin-docs/
+
+---
+
+## ✅ Success Checklist
+
+After setup, you should be able to:
+
+- [ ] Build the plugin (`npm run build`)
+- [ ] Load plugin in Figma Desktop
+- [ ] See plugin UI when opened
+- [ ] Configure GitHub token in settings
+- [ ] See "✅ Ready to sync" status
+- [ ] Click "Sync to GitHub" button
+- [ ] See success message
+- [ ] Find auto-created PR on GitHub
+- [ ] Merge PR successfully
+
+---
+
+**Ready?** Build the plugin and load it in Figma Desktop! 🚀

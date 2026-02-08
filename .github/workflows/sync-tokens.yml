@@ -1,0 +1,45 @@
+name: Sync Tokens from Figma
+
+on:
+  repository_dispatch:
+    types: [figma-sync]
+  workflow_dispatch:
+
+jobs:
+  sync-tokens:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Update color.json
+        run: |
+          echo '${{ toJson(github.event.client_payload.tokens) }}' > tokens/src/foundation/color.json
+      
+      - name: Validate tokens
+        run: node scripts/validate-tokens.js
+      
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: sync foundation colors from Figma"
+          branch: figma-sync/${{ github.run_number }}
+          title: "chore: sync foundation colors from Figma"
+          body: |
+            ## 🎨 Sync Foundation Colors from Figma
+            
+            This PR updates foundation color tokens synced from Figma via the Compass Token Sync plugin.
+            
+            **Synced at**: ${{ github.event.client_payload.timestamp }}
+            **Source**: ${{ github.event.client_payload.source }}
+            
+            ### What Changed
+            Review the diff in `tokens/src/foundation/color.json` to see updated color values.
+            
+            ---
+            *Auto-generated via Figma plugin*
