@@ -716,6 +716,92 @@ This structure makes it easy to:
 
 Foundation color tokens are extracted from Figma variables and normalized to uppercase HEX format.
 
+### Syncing Colors from Figma
+
+This repository includes a CLI tool to sync foundation colors from Figma to the token files.
+
+#### Prerequisites
+
+1. **Figma Personal Access Token**:
+   - Go to Figma → Settings → Account → Personal Access Tokens
+   - Create a token (any access level works - you just need read access to the file)
+   - Save the token securely
+
+2. **Figma File ID**:
+   - Find your file ID from the Figma URL
+   - Example: `https://figma.com/design/ABC123XYZ/Colors` → File ID: `ABC123XYZ`
+
+3. **GitHub CLI** (optional, for auto PR):
+   ```bash
+   brew install gh
+   gh auth login
+   ```
+
+4. **Node.js** and dependencies:
+   ```bash
+   npm install
+   ```
+
+#### Setup
+
+1. Copy the environment template:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit `.env` and add your credentials:
+   ```bash
+   FIGMA_API_TOKEN=your_token_here
+   FIGMA_FILE_ID=your_file_id_here
+   ```
+
+#### Usage
+
+Run the sync command:
+
+```bash
+npm run sync:figma
+```
+
+**What happens**:
+1. Fetches all color variables from your Figma file
+2. Filters for foundation colors only (blue/500, neutral/1000, etc.)
+3. Transforms RGB → uppercase HEX in DTCG format
+4. Validates the output against project rules
+5. Updates `tokens/src/foundation/color.json`
+6. Creates a git branch and commits the changes
+7. Creates a Pull Request (if GitHub CLI is configured)
+
+**Manual commit** (if you don't have GitHub CLI):
+```bash
+npm run sync:figma  # Updates color.json
+git add tokens/src/foundation/color.json
+git commit -m "chore: sync foundation colors from Figma"
+git push
+```
+
+#### Workflow
+
+1. **Edit colors in Figma** → Make your color changes
+2. **Publish library** → Publish your Figma library (standard workflow)
+3. **Run sync** → `npm run sync:figma` in your terminal
+4. **Review PR** → Review and merge the auto-generated pull request
+
+#### Validation
+
+You can validate token files at any time:
+
+```bash
+npm run validate
+```
+
+This checks:
+- ✅ HEX values are uppercase
+- ✅ DTCG schema compliance (`$type`, `$value` present)
+- ✅ No opacity variants in source (e.g., `-8`, `-16`)
+- ✅ Expected color families and shade counts
+- ✅ Proper token structure
+
 ### Platform-Agnostic Design
 
 **Unitless Dimension Values**: All dimension tokens (spacing, radius, border width, elevation) use unitless numbers for maximum cross-platform compatibility:
