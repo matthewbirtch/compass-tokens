@@ -4,7 +4,7 @@
  */
 
 // Configuration
-const GITHUB_REPO = 'mattermost/compass-tokens';
+const GITHUB_REPO = 'matthewbirtch/compass-tokens';
 const COLOR_JSON_PATH = 'tokens/src/foundation/color.json';
 const FOUNDATION_COLOR_PATTERN = /^(blue|indigo|neutral|cyan|purple|teal|yellow|orange|green|red)\/\d+$/;
 
@@ -127,6 +127,57 @@ async function extractColors() {
 }
 
 /**
+ * Validate tokens before sending to GitHub
+ */
+function validateTokens(tokens: any): { valid: boolean; errors: string[]; warnings: string[] } {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Check structure
+  if (!tokens.$schema) {
+    warnings.push('Missing $schema field');
+  }
+
+  if (!tokens.color || !tokens.color.foundation) {
+    errors.push('Invalid token structure');
+    return { valid: false, errors, warnings };
+  }
+
+  const foundation = tokens.color.foundation;
+  
+  // Validate each color family
+  Object.entries(foundation).forEach(([family, shades]: [string, any]) => {
+    Object.entries(shades).forEach(([shade, token]: [string, any]) => {
+      // Check required fields
+      if (!token.$type || token.$type !== 'color') {
+        errors.push(`${family}/${shade}: Invalid or missing $type`);
+      }
+
+      if (!token.$value) {
+        errors.push(`${family}/${shade}: Missing $value`);
+      } else {
+        // Validate HEX format (uppercase, 6 digits)
+        const hexPattern = /^#[0-9A-F]{6}$/;
+        if (!hexPattern.test(token.$value)) {
+          errors.push(`${family}/${shade}: Invalid HEX format "${token.$value}" (must be uppercase 6-digit HEX)`);
+        }
+      }
+
+      // Check for opacity variants (not allowed in source)
+      if (shade.match(/[-]\d+$/)) {
+        errors.push(`${family}/${shade}: Opacity variants not allowed in source tokens`);
+      }
+    });
+  });
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+/**
  * Trigger GitHub repository dispatch to create PR
  */
 async function triggerGitHubSync(tokens: any, githubToken: string) {
@@ -163,7 +214,6 @@ async function triggerGitHubSync(tokens: any, githubToken: string) {
  */
 async function saveTokensLocally(tokens: any) {
   const jsonContent = JSON.stringify(tokens, null, 2);
-  const blob = new Blob([jsonContent], { type: 'application/json' });
   
   // Send to UI for download
   figma.ui.postMessage({
@@ -182,6 +232,14 @@ figma.ui.onmessage = async (msg) => {
       case 'sync-to-github':
         figma.ui.postMessage({ type: 'sync-started' });
         
+        // Get GitHub token FIRST
+        const githubToken = await figma.clientStorage.getAsync('github-token');
+        console.log('Sync - Token check:', !!githubToken, 'Length:', githubToken ? githubToken.length : 0);
+        
+        if (!githubToken) {
+          throw new Error('GitHub token not configured. Please add it in Settings.');
+        }
+        
         // Extract colors
         const { tokens, stats } = await extractColors();
         
@@ -190,10 +248,14 @@ figma.ui.onmessage = async (msg) => {
           data: stats
         });
         
-        // Get GitHub token
-        const githubToken = await figma.clientStorage.getAsync('github-token');
-        if (!githubToken) {
-          throw new Error('GitHub token not configured. Please add it in Settings.');
+        // Validate tokens before sending
+        const validation = validateTokens(tokens);
+        if (!validation.valid) {
+          throw new Error(`Validation failed:\n${validation.errors.join('\n')}`);
+        }
+        
+        if (validation.warnings.length > 0) {
+          console.log('Validation warnings:', validation.warnings);
         }
         
         // Trigger GitHub sync
@@ -224,7 +286,11 @@ figma.ui.onmessage = async (msg) => {
         break;
       
       case 'save-github-token':
-        await figma.clientStorage.setAsync('github-token', msg.token);
+        if (!msg.token || msg.token.trim() === '') {
+          throw new Error('Token cannot be empty');
+        }
+        await figma.clientStorage.setAsync('github-token', msg.token.trim());
+        console.log('Token saved successfully');
         figma.ui.postMessage({ type: 'token-saved' });
         break;
       
@@ -236,6 +302,7 @@ figma.ui.onmessage = async (msg) => {
       case 'get-status':
         const token = await figma.clientStorage.getAsync('github-token');
         const sync = await figma.clientStorage.getAsync('last-sync');
+        console.log('Status check - Has token:', !!token, 'Token length:', token ? token.length : 0);
         figma.ui.postMessage({
           type: 'status',
           data: {

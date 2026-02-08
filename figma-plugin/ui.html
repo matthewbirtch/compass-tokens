@@ -96,28 +96,32 @@
     let lastSync = null;
 
     // Update status display
-    function updateStatus(has Token, sync) {
-      hasToken = hasToken;
-      lastSync = sync;
+    function updateStatus(tokenExists, syncTime) {
+      hasToken = tokenExists;  // Update the outer variable
+      lastSync = syncTime;
       
       const indicator = document.getElementById('status-indicator');
       const icon = document.getElementById('status-icon');
       const text = document.getElementById('status-text');
       const syncButton = document.getElementById('sync-button');
       const lastSyncEl = document.getElementById('last-sync');
+      const tokenInput = document.getElementById('github-token');
       
-      if (hasToken) {
+      if (tokenExists) {
         icon.textContent = '✅';
         text.textContent = 'Ready to sync';
         syncButton.disabled = false;
+        // Show placeholder indicating token is saved
+        tokenInput.placeholder = '••••••••••••••••••••••••• (saved)';
       } else {
         icon.textContent = '⚠️';
         text.textContent = 'Configure token in Settings';
         syncButton.disabled = true;
+        tokenInput.placeholder = 'ghp_...';
       }
       
-      if (sync) {
-        const date = new Date(sync);
+      if (syncTime) {
+        const date = new Date(syncTime);
         lastSyncEl.textContent = `Last sync: ${date.toLocaleString()}`;
       } else {
         lastSyncEl.textContent = 'Last sync: Never';
@@ -154,12 +158,16 @@
 
     // Handle sync to GitHub
     document.getElementById('sync-button').onclick = () => {
+      console.log('Sync button clicked');
+      console.log('Has token:', hasToken);
+      
       if (!hasToken) {
         showError('Please configure GitHub token in Settings first');
         return;
       }
       
       showProgress('Syncing to GitHub...', 'Extracting colors from Figma...');
+      console.log('Sending sync message to plugin');
       parent.postMessage({ pluginMessage: { type: 'sync-to-github' } }, '*');
     };
 
@@ -177,6 +185,7 @@
         return;
       }
       
+      showProgress('Saving token...', '');
       parent.postMessage({ 
         pluginMessage: { 
           type: 'save-github-token',
@@ -230,7 +239,10 @@
         
         case 'token-saved':
           showSuccess('GitHub token saved successfully!');
+          // Clear input field after saving
+          document.getElementById('github-token').value = '';
           updateStatus(true, lastSync);
+          console.log('Token saved, hasToken now:', hasToken);
           break;
         
         case 'token-cleared':
