@@ -180,12 +180,16 @@ async function extractAllTokens() {
 
   // Process all color variables
   for (const variable of colorVariables) {
+    console.log(`Processing variable: "${variable.name}"`);
     const category = categorizeVariable(variable.name);
     
     if (!category) {
+      console.log(`  ❌ Skipped (no matching category)`);
       stats.total.skipped++;
       continue;
     }
+    
+    console.log(`  ✓ Categorized as: ${category.type}`);
 
     // Process based on category
     if (category.type === 'foundation-color') {
@@ -221,26 +225,33 @@ async function extractAllTokens() {
         stats.total.processed++;
       }
     } else if (category.type === 'semantic-attachment') {
+      console.log(`  Processing semantic attachment: ${variable.name}`);
       const parsed = parseSemanticAttachmentName(variable.name);
       if (!parsed) {
+        console.log(`  ❌ Failed to parse semantic name`);
         stats.semanticAttachment.skipped++;
         stats.total.skipped++;
         continue;
       }
 
       const { color } = parsed;
+      console.log(`  Parsed color: ${color}`);
       
       // Get the first mode's value
       const modeId = Object.keys(variable.valuesByMode)[0];
       const value = variable.valuesByMode[modeId];
+      console.log(`  Value type:`, typeof value, value);
       
       // Check if it's an alias (reference to another variable)
       if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+        console.log(`  ✓ Is alias, resolving...`);
         const aliasedVariable = await figma.variables.getVariableByIdAsync(value.id);
         
         if (aliasedVariable) {
+          console.log(`  ✓ Resolved to: ${aliasedVariable.name}`);
           // Build reference string
           const reference = buildReference(aliasedVariable.name);
+          console.log(`  ✓ Reference: ${reference}`);
           
           semanticAttachmentTokens.color.semantic.attachment[color] = {
             $type: "color",
@@ -250,11 +261,13 @@ async function extractAllTokens() {
           stats.semanticAttachment.processed++;
           stats.total.processed++;
         } else {
+          console.log(`  ❌ Failed to resolve alias`);
           stats.semanticAttachment.skipped++;
           stats.total.skipped++;
         }
       } else if (typeof value === 'object' && 'r' in value) {
         // Direct color value (not recommended for semantic tokens, but handle it)
+        console.log(`  ✓ Direct color value`);
         const rgba = value as RGBA;
         const hexValue = rgbToHex(rgba);
         
@@ -265,6 +278,10 @@ async function extractAllTokens() {
         
         stats.semanticAttachment.processed++;
         stats.total.processed++;
+      } else {
+        console.log(`  ❌ Unknown value type`);
+        stats.semanticAttachment.skipped++;
+        stats.total.skipped++;
       }
     }
   }
