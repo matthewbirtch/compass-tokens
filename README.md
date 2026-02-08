@@ -511,7 +511,7 @@ The system includes multiple heading levels (1000 through 25) with weight variat
 |-------|------|------|--------|-------------|----------|
 | `body.300` | Open Sans | 18 | 400 | 28 | Large body text |
 | `body.200` | Open Sans | 16 | 400 | 24 | Default body text |
-| `body.100` | Open Sans | 14 | 400 | 20 | Base body text, UI elements |
+| `body.100` | Open Sans | 14 | 400 | 20 | **Default base body text**, UI elements |
 | `body.75` | Open Sans | 12 | 400 | 16 | Small text, helper text |
 | `body.50` | Open Sans | 11 | 400 | 16 | Extra small text, captions |
 | `body.25` | Open Sans | 10 | 400 | 16 | Smallest text, micro copy |
