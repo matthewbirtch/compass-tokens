@@ -2,12 +2,13 @@
 
 ## 🎯 What You Have
 
-A **Figma plugin** that syncs foundation color tokens from Figma to this repository!
+A **Figma plugin** that syncs design tokens from Figma to this repository!
 
 **How it works**:
 - ✅ Runs inside Figma Desktop (no API token needed!)
 - ✅ Direct access to your color variables
-- ✅ Transforms to DTCG format (uppercase HEX)
+- ✅ Syncs foundation colors + semantic attachment colors
+- ✅ Transforms to DTCG format (uppercase HEX or references)
 - ✅ Validates against project rules
 - ✅ Creates PR automatically on GitHub
 
@@ -104,19 +105,25 @@ Last sync: 2/8/2026, 4:30 PM
 
 ## 🎨 What Gets Synced
 
-**Foundation colors only**:
-- ✅ `blue/100` through `blue/800`
-- ✅ `indigo/100` through `indigo/800`
-- ✅ `neutral/0` through `neutral/1200`
+**Foundation Colors**:
+- ✅ Pattern: `blue/100` through `blue/800`
+- ✅ Pattern: `indigo/100` through `indigo/800`
+- ✅ Pattern: `neutral/0` through `neutral/1200`
 - ✅ All families: cyan, purple, teal, yellow, orange, green, red
+- ✅ Output: Uppercase HEX values (#1C58D9)
+- ✅ File: `tokens/src/foundation/color.json`
 
-**Pattern**: `colorFamily/shade` (e.g., `blue/500`, `neutral/1000`)
+**Semantic Attachment Colors**:
+- ✅ Pattern: `attachment/blue`, `attachment/green`, `attachment/grey`
+- ✅ 5 colors: blue, green, orange, red, grey
+- ✅ Output: Foundation references ({color.foundation.blue.300})
+- ✅ File: `tokens/src/semantic/attachment.json`
 
-**Not synced**:
+**Not synced yet**:
 - ❌ Theme variables (e.g., `Denim/Button BG`)
-- ❌ Attachment colors (e.g., `attachment-blue`)
-- ❌ Capitalized variants (e.g., `Blue/500`)
 - ❌ Typography variables
+- ❌ Spacing/Radius tokens
+- ❌ Capitalized variants (e.g., `Blue/500`)
 
 ---
 

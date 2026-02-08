@@ -716,9 +716,9 @@ This structure makes it easy to:
 
 Foundation color tokens are extracted from Figma variables and normalized to uppercase HEX format.
 
-### Syncing Colors from Figma
+### Syncing Tokens from Figma
 
-This repository includes a **Figma plugin** to sync foundation colors from Figma to the token files.
+This repository includes a **Figma plugin** to sync design tokens from Figma to the token files.
 
 #### Quick Start
 
@@ -748,11 +748,19 @@ This repository includes a **Figma plugin** to sync foundation colors from Figma
 
 #### What Gets Synced
 
-**Foundation colors only**:
+**Foundation Colors**:
 - ✅ Pattern: `blue/500`, `neutral/1000`, `red/400`
 - ✅ 10 color families (blue, indigo, neutral, cyan, purple, teal, yellow, orange, green, red)
-- ❌ Theme variables (Denim/Button BG) - not synced
-- ❌ Attachment colors (attachment-blue) - not synced
+- ✅ Output: Uppercase HEX values (#1C58D9)
+
+**Semantic Attachment Colors**:
+- ✅ Pattern: `attachment/blue`, `attachment/green`, `attachment/grey`
+- ✅ 5 colors (blue, green, orange, red, grey)
+- ✅ Output: Foundation color references ({color.foundation.blue.300})
+
+**Not synced yet**:
+- ❌ Theme variables (Denim/Button BG)
+- ❌ Typography, spacing, radius tokens
 
 #### Validation
 

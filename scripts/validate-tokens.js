@@ -20,30 +20,33 @@ const EXPECTED_FAMILIES = {
   'red': 8        // 100-800
 };
 
+// Expected semantic attachment colors
+const EXPECTED_SEMANTIC_ATTACHMENT = ['blue', 'green', 'orange', 'red', 'grey'];
+
 /**
- * Validate token structure and format
+ * Validate foundation color tokens
  * @param {Object} tokens - Token structure to validate
  * @returns {Object} - { valid: boolean, errors: string[], warnings: string[] }
  */
-function validateTokens(tokens) {
+function validateFoundationTokens(tokens) {
   const errors = [];
   const warnings = [];
 
   // Check for $schema
   if (!tokens.$schema) {
-    warnings.push('Missing $schema field');
+    warnings.push('Foundation: Missing $schema field');
   } else if (!tokens.$schema.includes('tr.designtokens.org')) {
-    warnings.push('$schema does not reference DTCG spec');
+    warnings.push('Foundation: $schema does not reference DTCG spec');
   }
 
   // Check structure
   if (!tokens.color) {
-    errors.push('Missing "color" top-level key');
+    errors.push('Foundation: Missing "color" top-level key');
     return { valid: false, errors, warnings };
   }
 
   if (!tokens.color.foundation) {
-    errors.push('Missing "color.foundation" key');
+    errors.push('Foundation: Missing "color.foundation" key');
     return { valid: false, errors, warnings };
   }
 
@@ -53,7 +56,7 @@ function validateTokens(tokens) {
   Object.entries(foundation).forEach(([family, shades]) => {
     // Check if family is expected
     if (!EXPECTED_FAMILIES[family]) {
-      warnings.push(`Unexpected color family: "${family}"`);
+      warnings.push(`Foundation: Unexpected color family: "${family}"`);
     }
 
     // Validate each shade
@@ -95,7 +98,7 @@ function validateTokens(tokens) {
     const expectedCount = EXPECTED_FAMILIES[family];
     if (expectedCount && shadeCount !== expectedCount) {
       warnings.push(
-        `${family}: Expected ${expectedCount} shades, found ${shadeCount}`
+        `Foundation ${family}: Expected ${expectedCount} shades, found ${shadeCount}`
       );
     }
   });
@@ -103,7 +106,7 @@ function validateTokens(tokens) {
   // Check for missing families
   Object.keys(EXPECTED_FAMILIES).forEach(family => {
     if (!foundation[family]) {
-      warnings.push(`Missing expected color family: "${family}"`);
+      warnings.push(`Foundation: Missing expected color family: "${family}"`);
     }
   });
 
@@ -115,11 +118,92 @@ function validateTokens(tokens) {
 }
 
 /**
- * Validate color.json file
- * @param {string} filePath - Path to color.json
+ * Validate semantic attachment tokens
+ * @param {Object} tokens - Token structure to validate
+ * @returns {Object} - { valid: boolean, errors: string[], warnings: string[] }
+ */
+function validateSemanticAttachmentTokens(tokens) {
+  const errors = [];
+  const warnings = [];
+
+  // Check for $schema
+  if (!tokens.$schema) {
+    warnings.push('Semantic: Missing $schema field');
+  } else if (!tokens.$schema.includes('tr.designtokens.org')) {
+    warnings.push('Semantic: $schema does not reference DTCG spec');
+  }
+
+  // Check structure
+  if (!tokens.color) {
+    errors.push('Semantic: Missing "color" top-level key');
+    return { valid: false, errors, warnings };
+  }
+
+  if (!tokens.color.semantic || !tokens.color.semantic.attachment) {
+    errors.push('Semantic: Missing "color.semantic.attachment" key');
+    return { valid: false, errors, warnings };
+  }
+
+  const attachment = tokens.color.semantic.attachment;
+
+  // Validate each attachment color
+  Object.entries(attachment).forEach(([colorName, token]) => {
+    const tokenPath = `color.semantic.attachment.${colorName}`;
+
+    // Check for required fields
+    if (!token.$type) {
+      errors.push(`${tokenPath}: Missing $type field`);
+    } else if (token.$type !== 'color') {
+      errors.push(`${tokenPath}: Invalid $type "${token.$type}" (expected "color")`);
+    }
+
+    if (!token.$value) {
+      errors.push(`${tokenPath}: Missing $value field`);
+    } else {
+      // Check if it's a reference or direct value
+      const isReference = typeof token.$value === 'string' && 
+                         token.$value.startsWith('{') && 
+                         token.$value.endsWith('}');
+      const isHex = typeof token.$value === 'string' && 
+                   /^#[0-9A-F]{6}$/i.test(token.$value);
+      
+      if (!isReference && !isHex) {
+        errors.push(
+          `${tokenPath}: Value must be either a reference like {color.foundation.blue.300} or a HEX color`
+        );
+      }
+      
+      // Warn if using direct hex instead of reference
+      if (isHex) {
+        warnings.push(
+          `${tokenPath}: Using direct HEX value instead of reference. ` +
+          `Consider using foundation color references for better maintainability.`
+        );
+      }
+    }
+  });
+
+  // Check for missing expected colors
+  EXPECTED_SEMANTIC_ATTACHMENT.forEach(colorName => {
+    if (!attachment[colorName]) {
+      warnings.push(`Semantic: Missing expected attachment color: "${colorName}"`);
+    }
+  });
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+/**
+ * Validate a token file
+ * @param {string} filePath - Path to token file
+ * @param {string} type - Type of token file ('foundation' or 'semantic')
  * @returns {Object} - Validation result
  */
-function validateColorFile(filePath) {
+function validateTokenFile(filePath, type) {
   if (!fs.existsSync(filePath)) {
     return {
       valid: false,
@@ -131,7 +215,18 @@ function validateColorFile(filePath) {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
     const tokens = JSON.parse(content);
-    return validateTokens(tokens);
+    
+    if (type === 'foundation') {
+      return validateFoundationTokens(tokens);
+    } else if (type === 'semantic') {
+      return validateSemanticAttachmentTokens(tokens);
+    } else {
+      return {
+        valid: false,
+        errors: [`Unknown validation type: ${type}`],
+        warnings: []
+      };
+    }
   } catch (error) {
     return {
       valid: false,
@@ -143,55 +238,61 @@ function validateColorFile(filePath) {
 
 /**
  * Print validation results
+ * @param {string} filename - Name of the file being validated
  * @param {Object} result - Validation result
  */
-function printResults(result) {
-  console.log('\n' + '='.repeat(60));
-  console.log('TOKEN VALIDATION RESULTS');
-  console.log('='.repeat(60) + '\n');
+function printResults(filename, result) {
+  console.log(`\n📄 ${filename}`);
+  console.log('-'.repeat(60));
 
   if (result.errors.length === 0 && result.warnings.length === 0) {
-    console.log('✅ All validations passed!\n');
+    console.log('✅ All validations passed!');
     return;
   }
 
   if (result.errors.length > 0) {
-    console.log('❌ ERRORS:\n');
+    console.log('❌ ERRORS:');
     result.errors.forEach(error => {
       console.log(`  • ${error}`);
     });
-    console.log();
   }
 
   if (result.warnings.length > 0) {
-    console.log('⚠️  WARNINGS:\n');
+    console.log('⚠️  WARNINGS:');
     result.warnings.forEach(warning => {
       console.log(`  • ${warning}`);
     });
-    console.log();
   }
-
-  console.log('='.repeat(60) + '\n');
 }
 
 // Main execution when run directly
 if (require.main === module) {
-  const colorJsonPath = path.join(__dirname, '../tokens/src/foundation/color.json');
+  const foundationColorPath = path.join(__dirname, '../tokens/src/foundation/color.json');
+  const semanticAttachmentPath = path.join(__dirname, '../tokens/src/semantic/attachment.json');
   
-  console.log('Validating color tokens...');
-  console.log(`File: ${colorJsonPath}\n`);
+  console.log('\n' + '='.repeat(60));
+  console.log('TOKEN VALIDATION');
+  console.log('='.repeat(60));
 
-  const result = validateColorFile(colorJsonPath);
-  printResults(result);
+  // Validate foundation colors
+  const foundationResult = validateTokenFile(foundationColorPath, 'foundation');
+  printResults('Foundation Colors', foundationResult);
 
-  // Exit with error code if validation failed
-  if (!result.valid) {
+  // Validate semantic attachment
+  const semanticResult = validateTokenFile(semanticAttachmentPath, 'semantic');
+  printResults('Semantic Attachment Colors', semanticResult);
+
+  console.log('\n' + '='.repeat(60) + '\n');
+
+  // Exit with error code if any validation failed
+  if (!foundationResult.valid || !semanticResult.valid) {
     process.exit(1);
   }
 }
 
 module.exports = {
-  validateTokens,
-  validateColorFile,
+  validateFoundationTokens,
+  validateSemanticAttachmentTokens,
+  validateTokenFile,
   printResults
 };

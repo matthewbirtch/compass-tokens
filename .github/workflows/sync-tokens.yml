@@ -20,9 +20,17 @@ jobs:
         with:
           node-version: '18'
       
-      - name: Update color.json
+      - name: Update token files
         run: |
-          echo '${{ toJson(github.event.client_payload.tokens) }}' > tokens/src/foundation/color.json
+          # Parse the files payload and update each file
+          FILES='${{ toJson(github.event.client_payload.files) }}'
+          echo "Received files payload"
+          
+          # Extract and update each file
+          echo "$FILES" | jq -r 'to_entries | .[] | "\(.key)|\(.value)"' | while IFS='|' read -r filepath content; do
+            echo "Updating $filepath"
+            echo "$content" | jq '.' > "$filepath"
+          done
       
       - name: Validate tokens
         run: node scripts/validate-tokens.js
@@ -30,32 +38,46 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if git diff --quiet tokens/src/foundation/color.json; then
+          if git diff --quiet tokens/src/; then
             echo "has_changes=false" >> $GITHUB_OUTPUT
-            echo "No changes detected - colors are already in sync"
+            echo "No changes detected - tokens are already in sync"
           else
             echo "has_changes=true" >> $GITHUB_OUTPUT
             echo "Changes detected - will create PR"
+            echo "Changed files:"
+            git diff --name-only tokens/src/
           fi
+      
+      - name: Get changed files list
+        if: steps.check_changes.outputs.has_changes == 'true'
+        id: changed_files
+        run: |
+          CHANGED=$(git diff --name-only tokens/src/ | tr '\n' ', ' | sed 's/,$//')
+          echo "files=$CHANGED" >> $GITHUB_OUTPUT
       
       - name: Create Pull Request
         if: steps.check_changes.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: sync foundation colors from Figma"
+          commit-message: "chore: sync tokens from Figma"
           branch: figma-sync/${{ github.run_number }}
-          title: "chore: sync foundation colors from Figma"
+          title: "chore: sync tokens from Figma"
           body: |
-            ## 🎨 Sync Foundation Colors from Figma
+            ## 🎨 Sync Design Tokens from Figma
             
-            This PR updates foundation color tokens synced from Figma via the Compass Token Sync plugin.
+            This PR updates design tokens synced from Figma via the Compass Token Sync plugin.
             
             **Synced at**: ${{ github.event.client_payload.timestamp }}
             **Source**: ${{ github.event.client_payload.source }}
             
+            ### Files Changed
+            ${{ steps.changed_files.outputs.files }}
+            
             ### What Changed
-            Review the diff in `tokens/src/foundation/color.json` to see updated color values.
+            Review the diffs to see updated token values:
+            - Foundation colors: Raw HEX color values
+            - Semantic tokens: References to foundation colors
             
             ---
             *Auto-generated via Figma plugin*

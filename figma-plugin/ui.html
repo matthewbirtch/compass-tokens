@@ -10,7 +10,7 @@
     <!-- Header -->
     <div class="header">
       <h1>🎨 Compass Token Sync</h1>
-      <p class="subtitle">Sync foundation colors to GitHub</p>
+      <p class="subtitle">Sync design tokens to GitHub</p>
     </div>
 
     <!-- Status Section -->
@@ -74,18 +74,25 @@
     <details class="section">
       <summary>ℹ️ What Gets Synced</summary>
       <div class="info-content">
-        <p><strong>Synced:</strong></p>
+        <p><strong>Foundation Colors:</strong></p>
         <ul>
-          <li>✅ Foundation colors only</li>
           <li>✅ Pattern: <code>blue/500</code>, <code>neutral/1000</code></li>
           <li>✅ 10 color families × 8-25 shades</li>
+          <li>✅ Output: HEX values (#1C58D9)</li>
         </ul>
         
-        <p><strong>Not synced:</strong></p>
+        <p><strong>Semantic Attachment Colors:</strong></p>
+        <ul>
+          <li>✅ Pattern: <code>attachment/blue</code>, <code>attachment/grey</code></li>
+          <li>✅ 5 colors (blue, green, orange, red, grey)</li>
+          <li>✅ Output: Foundation references ({color.foundation.blue.300})</li>
+        </ul>
+        
+        <p><strong>Not synced yet:</strong></p>
         <ul>
           <li>❌ Theme variables (Denim/Button BG)</li>
-          <li>❌ Attachment colors (attachment-blue)</li>
           <li>❌ Typography variables</li>
+          <li>❌ Spacing/Radius tokens</li>
         </ul>
       </div>
     </details>
@@ -218,22 +225,47 @@
           break;
         
         case 'extracted':
+          const totalTokens = msg.data.total.processed;
+          const foundationCount = msg.data.foundationColors.processed;
+          const semanticCount = msg.data.semanticAttachment.processed;
+          
           showProgress(
-            'Colors extracted!',
-            `Processed ${msg.data.processed} colors from ${msg.data.families} families`
+            'Tokens extracted!',
+            `Foundation colors: ${foundationCount} | Semantic attachment: ${semanticCount} | Total: ${totalTokens}`
           );
           break;
         
         case 'sync-success':
+          const totalSynced = msg.data.totalTokens;
+          const filesChanged = msg.data.changedFiles.length;
+          const fileList = msg.data.changedFiles.map(f => f.split('/').pop()).join(', ');
+          
           showSuccess(
-            `Successfully synced ${msg.data.colorCount} colors! Pull request created on GitHub.`
+            `Successfully synced ${totalSynced} tokens across ${filesChanged} file(s)! Pull request created.\n\n` +
+            `Files: ${fileList}`
           );
           updateStatus(true, msg.data.timestamp);
           break;
         
+        case 'no-changes':
+          showProgress(
+            'ℹ️ No changes detected',
+            `All ${msg.data.totalTokens} tokens are already in sync with the repository!`
+          );
+          setTimeout(hideProgress, 4000);
+          break;
+        
+        case 'progress':
+          showProgress('⏳ Syncing...', msg.message);
+          break;
+        
         case 'saved-locally':
+          const savedTotal = msg.data.total.processed;
+          const savedFoundation = msg.data.foundationColors.processed;
+          const savedSemantic = msg.data.semanticAttachment.processed;
+          
           showSuccess(
-            `Exported ${msg.data.processed} colors. Check your downloads folder for color.json`
+            `Exported ${savedTotal} tokens (${savedFoundation} foundation + ${savedSemantic} semantic). Check your downloads folder!`
           );
           break;
         
