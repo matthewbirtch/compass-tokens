@@ -338,14 +338,13 @@ function findClosestLineHeightScale(pixelValue: number, fontSize: number): strin
 }
 
 /**
- * Custom JSON stringify that preserves key order exactly as inserted
+ * Custom JSON stringify that preserves key order exactly as specified
  * JavaScript's JSON.stringify reorders numeric-like keys, which breaks our sorting
  */
-function stringifyPreservingOrder(obj: any, indent: number = 2): string {
+function stringifyPreservingOrder(obj: any, indent: number = 2, keyOrder?: Map<any, string[]>): string {
   const indentStr = ' '.repeat(indent);
-  const lines: string[] = [];
   
-  function stringify(value: any, depth: number): string {
+  function stringify(value: any, depth: number, path: string = ''): string {
     const currentIndent = indentStr.repeat(depth);
     const nextIndent = indentStr.repeat(depth + 1);
     
@@ -355,16 +354,17 @@ function stringifyPreservingOrder(obj: any, indent: number = 2): string {
     
     if (Array.isArray(value)) {
       if (value.length === 0) return '[]';
-      const items = value.map(item => `${nextIndent}${stringify(item, depth + 1)}`);
+      const items = value.map((item, idx) => `${nextIndent}${stringify(item, depth + 1, `${path}[${idx}]`)}`);
       return `[\n${items.join(',\n')}\n${currentIndent}]`;
     }
     
     if (typeof value === 'object') {
-      const keys = Object.keys(value);
+      // Use provided key order if available, otherwise use Object.keys
+      const keys = keyOrder?.get(value) || Object.keys(value);
       if (keys.length === 0) return '{}';
       
       const pairs = keys.map(key => {
-        const val = stringify(value[key], depth + 1);
+        const val = stringify(value[key], depth + 1, `${path}.${key}`);
         return `${nextIndent}${JSON.stringify(key)}: ${val}`;
       });
       
@@ -460,11 +460,14 @@ async function extractSemanticTypographyTokens() {
     stats.processed++;
   }
   
+  // Store the correct key order for each category to pass to stringify
+  const keyOrderMap = new Map<any, string[]>();
+  
   // Sort heading, body, and code tokens by size (ascending)
   ['heading', 'body', 'code'].forEach(category => {
     if (Object.keys(tokens.typography.semantic[category]).length > 0) {
-      const sorted: any = {};
-      const keys = Object.keys(tokens.typography.semantic[category]).sort((a, b) => {
+      const categoryObj = tokens.typography.semantic[category];
+      const sortedKeys = Object.keys(categoryObj).sort((a, b) => {
         // Extract numeric size from key (e.g., "1000" or "1000-regular")
         const sizeA = parseInt(a.split('-')[0]);
         const sizeB = parseInt(b.split('-')[0]);
@@ -483,12 +486,16 @@ async function extractSemanticTypographyTokens() {
         if (variantA !== '' && variantB === '') return 1;
         return variantA.localeCompare(variantB);
       });
-      keys.forEach(key => {
-        sorted[key] = tokens.typography.semantic[category][key];
-      });
-      tokens.typography.semantic[category] = sorted;
+      
+      // Store the sorted key order for this category object
+      keyOrderMap.set(categoryObj, sortedKeys);
     }
   });
+  
+  // Store key order for the semantic object and main typography object
+  keyOrderMap.set(tokens.typography.semantic, ['heading', 'body', 'code']);
+  keyOrderMap.set(tokens.typography, ['semantic']);
+  keyOrderMap.set(tokens, ['$schema', 'typography']);
   
   console.log(`Semantic typography token structure:`, {
     headingCount: Object.keys(tokens.typography.semantic.heading).length,
@@ -496,11 +503,11 @@ async function extractSemanticTypographyTokens() {
     codeCount: Object.keys(tokens.typography.semantic.code).length
   });
   
-  // Debug: show first 10 heading keys to verify order
-  const headingKeys = Object.keys(tokens.typography.semantic.heading);
-  console.log(`First 10 heading keys (to verify order):`, headingKeys.slice(0, 10));
+  // Debug: show first 10 heading keys from our sorted order
+  const sortedHeadingKeys = keyOrderMap.get(tokens.typography.semantic.heading) || [];
+  console.log(`First 10 heading keys (sorted order):`, sortedHeadingKeys.slice(0, 10));
   
-  return { tokens, stats };
+  return { tokens, stats, keyOrderMap };
 }
 
 /**
@@ -1041,7 +1048,7 @@ async function extractAllTokens() {
 
   // Extract semantic typography from text styles
   console.log('Extracting semantic typography from text styles...');
-  const { tokens: semanticTypographyTokens, stats: semanticTypoStats } = await extractSemanticTypographyTokens();
+  const { tokens: semanticTypographyTokens, stats: semanticTypoStats, keyOrderMap: semanticKeyOrderMap } = await extractSemanticTypographyTokens();
   console.log(`Semantic typography extraction complete: processed=${semanticTypoStats.processed}, skipped=${semanticTypoStats.skipped}`);
   stats.semanticTypography = semanticTypoStats;
   stats.total.processed += semanticTypoStats.processed;
@@ -1060,6 +1067,9 @@ async function extractAllTokens() {
     stats: {
       ...stats,
       foundationColorFamilies: Object.keys(foundationColorTokens.color.foundation).length
+    },
+    keyOrderMaps: {
+      [TOKEN_FILES.TYPOGRAPHY_SEMANTIC]: semanticKeyOrderMap
     }
   };
 }
@@ -2069,14 +2079,15 @@ function detectChanges(newTokensMap: any, currentTokensMap: any): { hasChanges: 
 /**
  * Trigger GitHub repository dispatch to create PR with multiple files
  */
-async function triggerGitHubSync(tokensMap: any, changedFiles: string[], githubToken: string) {
+async function triggerGitHubSync(tokensMap: any, changedFiles: string[], githubToken: string, keyOrderMaps?: any) {
   const url = `https://api.github.com/repos/${GITHUB_REPO}/dispatches`;
   
   // Prepare file updates for only changed files
   // Pre-stringify to preserve key order through GitHub API transmission
   const fileUpdates: any = {};
   for (const filePath of changedFiles) {
-    fileUpdates[filePath] = stringifyPreservingOrder(tokensMap[filePath], 2);
+    const keyOrderMap = keyOrderMaps?.[filePath];
+    fileUpdates[filePath] = stringifyPreservingOrder(tokensMap[filePath], 2, keyOrderMap);
   }
   
   const response = await fetch(url, {
@@ -2108,10 +2119,11 @@ async function triggerGitHubSync(tokensMap: any, changedFiles: string[], githubT
 /**
  * Save tokens to local files (alternative to GitHub sync)
  */
-async function saveTokensLocally(tokensMap: any) {
+async function saveTokensLocally(tokensMap: any, keyOrderMaps?: any) {
   // Send each file to UI for download
   for (const [filePath, tokens] of Object.entries(tokensMap)) {
-    const jsonContent = stringifyPreservingOrder(tokens, 2);
+    const keyOrderMap = keyOrderMaps?.[filePath];
+    const jsonContent = stringifyPreservingOrder(tokens, 2, keyOrderMap);
     const filename = filePath.split('/').pop() || 'tokens.json';
     
     figma.ui.postMessage({
@@ -2141,7 +2153,7 @@ figma.ui.onmessage = async (msg) => {
         
         // Extract all tokens from Figma
         figma.ui.postMessage({ type: 'progress', message: 'Extracting tokens from Figma...' });
-        const { tokens: tokensMap, stats } = await extractAllTokens();
+        const { tokens: tokensMap, stats, keyOrderMaps } = await extractAllTokens();
         
         // Also try to extract themes
         figma.ui.postMessage({ type: 'progress', message: 'Checking for theme variables...' });
@@ -2202,7 +2214,7 @@ figma.ui.onmessage = async (msg) => {
         
         // Trigger GitHub sync with only changed files
         figma.ui.postMessage({ type: 'progress', message: 'Creating pull request...' });
-        await triggerGitHubSync(tokensMap, changeDetection.changedFiles, githubToken);
+        await triggerGitHubSync(tokensMap, changeDetection.changedFiles, githubToken, keyOrderMaps);
         
         // Save last sync time
         await figma.clientStorage.setAsync('last-sync', Date.now());
@@ -2223,7 +2235,7 @@ figma.ui.onmessage = async (msg) => {
         figma.ui.postMessage({ type: 'sync-started' });
         
         const result = await extractAllTokens();
-        await saveTokensLocally(result.tokens);
+        await saveTokensLocally(result.tokens, result.keyOrderMaps);
         
         figma.ui.postMessage({
           type: 'saved-locally',
