@@ -12,6 +12,7 @@ const TOKEN_FILES = {
   SEMANTIC_ATTACHMENT: 'tokens/src/semantic/attachment.json',
   FOUNDATION_RADIUS: 'tokens/src/foundation/radius.json',
   FOUNDATION_SPACING: 'tokens/src/foundation/spacing.json',
+  TYPOGRAPHY_FOUNDATION: 'tokens/src/foundation/typography.json',
   THEME_DENIM: 'tokens/src/themes/denim.json',
   THEME_SAPPHIRE: 'tokens/src/themes/sapphire.json',
   THEME_QUARTZ: 'tokens/src/themes/quartz.json',
@@ -33,20 +34,31 @@ const FOUNDATION_COLOR_PATTERN = /^(blue|indigo|neutral|cyan|purple|teal|yellow|
 const SEMANTIC_ATTACHMENT_PATTERN = /^attachment\/(blue|green|orange|red|grey)$/;
 const FOUNDATION_RADIUS_PATTERN = /^radius-(xs|s|m|l|xl|full)$/;
 const FOUNDATION_SPACING_PATTERN = /^spacing-(xxxxs|xs|m|l|xl|xxl|xxxl|xxxxl)$/;
+const TYPOGRAPHY_FONT_FAMILY_PATTERN = /^font-family\/(heading|body|mono)$/;
+const TYPOGRAPHY_FONT_SIZE_PATTERN = /^font-size\/(25|50|75|100|200|300|400|500|600|700|800|900|1000)$/;
+const TYPOGRAPHY_FONT_WEIGHT_PATTERN = /^font-weight\/(light|regular|semibold|bold)$/;
+const TYPOGRAPHY_LINE_HEIGHT_PATTERN = /^line-height\/(16|20|24|28|30|36|40|44|48)$/;
+const TYPOGRAPHY_LETTER_SPACING_PATTERN = /^letter-spacing\/(tight-2|tight-1|normal|wide-1|wide-2)$/;
 
 // Token category definitions
 interface TokenCategory {
   type: string;
   path: string;
   pattern: RegExp;
-  variableType: 'COLOR' | 'FLOAT';
+  variableType: 'COLOR' | 'FLOAT' | 'STRING';
+  subtype?: string;
 }
 
 const TOKEN_CATEGORIES: TokenCategory[] = [
   { type: 'foundation-color', path: TOKEN_FILES.FOUNDATION_COLOR, pattern: FOUNDATION_COLOR_PATTERN, variableType: 'COLOR' },
   { type: 'semantic-attachment', path: TOKEN_FILES.SEMANTIC_ATTACHMENT, pattern: SEMANTIC_ATTACHMENT_PATTERN, variableType: 'COLOR' },
   { type: 'foundation-radius', path: TOKEN_FILES.FOUNDATION_RADIUS, pattern: FOUNDATION_RADIUS_PATTERN, variableType: 'FLOAT' },
-  { type: 'foundation-spacing', path: TOKEN_FILES.FOUNDATION_SPACING, pattern: FOUNDATION_SPACING_PATTERN, variableType: 'FLOAT' }
+  { type: 'foundation-spacing', path: TOKEN_FILES.FOUNDATION_SPACING, pattern: FOUNDATION_SPACING_PATTERN, variableType: 'FLOAT' },
+  { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_FONT_FAMILY_PATTERN, variableType: 'STRING', subtype: 'fontFamily' },
+  { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_FONT_SIZE_PATTERN, variableType: 'FLOAT', subtype: 'fontSize' },
+  { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_FONT_WEIGHT_PATTERN, variableType: 'FLOAT', subtype: 'fontWeight' },
+  { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_LINE_HEIGHT_PATTERN, variableType: 'FLOAT', subtype: 'lineHeight' },
+  { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_LETTER_SPACING_PATTERN, variableType: 'FLOAT', subtype: 'letterSpacing' }
 ];
 
 // File configuration interface
@@ -173,6 +185,159 @@ function parseSemanticAttachmentName(name: string): { color: string } | null {
 }
 
 /**
+ * Parse font family string (comma-separated) into array
+ */
+function parseFontFamily(value: string): string[] {
+  return value.split(',').map(s => s.trim());
+}
+
+/**
+ * Parse typography variable name into property type and value
+ */
+function parseTypographyVariableName(name: string): { property: string; value: string } | null {
+  // Font family: font-family/heading
+  let match = name.match(/^font-family\/([a-z]+)$/i);
+  if (match) {
+    return {
+      property: 'fontFamily',
+      value: match[1].toLowerCase()
+    };
+  }
+  
+  // Font size: font-size/200
+  match = name.match(/^font-size\/(\d+)$/i);
+  if (match) {
+    return {
+      property: 'fontSize',
+      value: match[1]
+    };
+  }
+  
+  // Font weight: font-weight/bold
+  match = name.match(/^font-weight\/([a-z]+)$/i);
+  if (match) {
+    return {
+      property: 'fontWeight',
+      value: match[1].toLowerCase()
+    };
+  }
+  
+  // Line height: line-height/24
+  match = name.match(/^line-height\/(\d+)$/i);
+  if (match) {
+    return {
+      property: 'lineHeight',
+      value: match[1]
+    };
+  }
+  
+  // Letter spacing: letter-spacing/tight-1
+  match = name.match(/^letter-spacing\/(.+)$/i);
+  if (match) {
+    return {
+      property: 'letterSpacing',
+      value: match[1].toLowerCase()
+    };
+  }
+  
+  return null;
+}
+
+/**
+ * Build foundation typography tokens from Figma variables
+ */
+function buildFoundationTypographyTokens(variables: Variable[]): any {
+  const tokens: any = {
+    $schema: "https://tr.designtokens.org/format/",
+    typography: {
+      foundation: {
+        fontFamily: {},
+        fontSize: {},
+        fontWeight: {},
+        lineHeight: {},
+        letterSpacing: {}
+      }
+    }
+  };
+  
+  for (const variable of variables) {
+    const parsed = parseTypographyVariableName(variable.name);
+    if (!parsed) continue;
+    
+    const { property, value } = parsed;
+    
+    // Get the first mode's value
+    const modeId = Object.keys(variable.valuesByMode)[0];
+    const varValue = variable.valuesByMode[modeId];
+    
+    if (property === 'fontFamily') {
+      // Handle font family (STRING type)
+      if (typeof varValue === 'string') {
+        const fontStack = parseFontFamily(varValue);
+        tokens.typography.foundation.fontFamily[value] = {
+          $type: "fontFamily",
+          $value: fontStack
+        };
+      }
+    } else if (property === 'fontSize') {
+      // Handle font size (FLOAT type)
+      if (typeof varValue === 'number') {
+        tokens.typography.foundation.fontSize[value] = {
+          $type: "dimension",
+          $value: varValue
+        };
+      }
+    } else if (property === 'fontWeight') {
+      // Handle font weight (FLOAT type)
+      if (typeof varValue === 'number') {
+        tokens.typography.foundation.fontWeight[value] = {
+          $type: "fontWeight",
+          $value: varValue
+        };
+      }
+    } else if (property === 'lineHeight') {
+      // Handle line height (FLOAT type)
+      if (typeof varValue === 'number') {
+        tokens.typography.foundation.lineHeight[value] = {
+          $type: "dimension",
+          $value: varValue
+        };
+      }
+    } else if (property === 'letterSpacing') {
+      // Handle letter spacing (FLOAT type, can be negative)
+      if (typeof varValue === 'number') {
+        tokens.typography.foundation.letterSpacing[value] = {
+          $type: "dimension",
+          $value: varValue
+        };
+      }
+    }
+  }
+  
+  // Sort font sizes numerically
+  if (Object.keys(tokens.typography.foundation.fontSize).length > 0) {
+    const sortedSizes: any = {};
+    const sizeKeys = Object.keys(tokens.typography.foundation.fontSize).sort((a, b) => Number(a) - Number(b));
+    sizeKeys.forEach(key => {
+      sortedSizes[key] = tokens.typography.foundation.fontSize[key];
+    });
+    tokens.typography.foundation.fontSize = sortedSizes;
+  }
+  
+  // Sort line heights numerically
+  if (Object.keys(tokens.typography.foundation.lineHeight).length > 0) {
+    const sortedHeights: any = {};
+    const heightKeys = Object.keys(tokens.typography.foundation.lineHeight).sort((a, b) => Number(a) - Number(b));
+    heightKeys.forEach(key => {
+      sortedHeights[key] = tokens.typography.foundation.lineHeight[key];
+    });
+    tokens.typography.foundation.lineHeight = sortedHeights;
+  }
+  
+  return tokens;
+}
+
+/**
  * Resolve a variable alias to its final value
  */
 async function resolveVariableAlias(variable: Variable): Promise<string | null> {
@@ -215,6 +380,7 @@ async function extractAllTokens() {
   // Fetch all variable types
   const colorVariables = await figma.variables.getLocalVariablesAsync('COLOR');
   const floatVariables = await figma.variables.getLocalVariablesAsync('FLOAT');
+  const stringVariables = await figma.variables.getLocalVariablesAsync('STRING');
   
   // Initialize token structures
   const foundationColorTokens: any = {
@@ -252,6 +418,7 @@ async function extractAllTokens() {
     semanticAttachment: { processed: 0, skipped: 0 },
     foundationRadius: { processed: 0, skipped: 0 },
     foundationSpacing: { processed: 0, skipped: 0 },
+    foundationTypography: { processed: 0, skipped: 0 },
     total: { processed: 0, skipped: 0 }
   };
 
@@ -485,12 +652,49 @@ async function extractAllTokens() {
     foundationSpacingTokens.spacing.foundation = sortedSpacing;
   }
 
+  // Process typography variables (both STRING and FLOAT)
+  console.log('Processing typography variables...');
+  const typographyVariables: Variable[] = [];
+  
+  // Collect STRING variables (font families)
+  for (const variable of stringVariables) {
+    console.log(`Processing STRING variable: "${variable.name}"`);
+    const category = categorizeVariable(variable.name, 'STRING');
+    
+    if (category && category.type === 'typography-foundation') {
+      console.log(`  ✓ Categorized as typography: ${category.subtype}`);
+      typographyVariables.push(variable);
+      stats.foundationTypography.processed++;
+      stats.total.processed++;
+    } else {
+      console.log(`  ❌ Skipped (no matching category)`);
+      stats.total.skipped++;
+    }
+  }
+  
+  // Collect FLOAT variables (font sizes, weights, line heights, letter spacing)
+  for (const variable of floatVariables) {
+    const category = categorizeVariable(variable.name, 'FLOAT');
+    
+    if (category && category.type === 'typography-foundation') {
+      console.log(`Processing FLOAT typography variable: "${variable.name}" (${category.subtype})`);
+      typographyVariables.push(variable);
+      stats.foundationTypography.processed++;
+      stats.total.processed++;
+    }
+  }
+  
+  // Build typography tokens from collected variables
+  const typographyTokens = buildFoundationTypographyTokens(typographyVariables);
+  console.log(`Built typography tokens with ${typographyVariables.length} variables`);
+
   return {
     tokens: {
       [TOKEN_FILES.FOUNDATION_COLOR]: foundationColorTokens,
       [TOKEN_FILES.SEMANTIC_ATTACHMENT]: semanticAttachmentTokens,
       [TOKEN_FILES.FOUNDATION_RADIUS]: foundationRadiusTokens,
-      [TOKEN_FILES.FOUNDATION_SPACING]: foundationSpacingTokens
+      [TOKEN_FILES.FOUNDATION_SPACING]: foundationSpacingTokens,
+      [TOKEN_FILES.TYPOGRAPHY_FOUNDATION]: typographyTokens
     },
     stats: {
       ...stats,
@@ -846,6 +1050,118 @@ function validateSpacingTokens(tokens: any): { valid: boolean; errors: string[];
 }
 
 /**
+ * Validate foundation typography tokens
+ */
+function validateTypographyTokens(tokens: any): { valid: boolean; errors: string[]; warnings: string[] } {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Check structure
+  if (!tokens.$schema) {
+    warnings.push('Typography: Missing $schema field');
+  }
+
+  if (!tokens.typography || !tokens.typography.foundation) {
+    errors.push('Typography: Invalid token structure');
+    return { valid: false, errors, warnings };
+  }
+
+  const foundation = tokens.typography.foundation;
+  
+  // Validate font families
+  if (foundation.fontFamily) {
+    Object.entries(foundation.fontFamily).forEach(([name, token]: [string, any]) => {
+      if (!token.$type || token.$type !== 'fontFamily') {
+        errors.push(`Typography fontFamily ${name}: Invalid or missing $type (expected "fontFamily")`);
+      }
+
+      if (!token.$value) {
+        errors.push(`Typography fontFamily ${name}: Missing $value`);
+      } else if (!Array.isArray(token.$value)) {
+        errors.push(`Typography fontFamily ${name}: Value must be an array of strings`);
+      } else if (token.$value.length === 0) {
+        errors.push(`Typography fontFamily ${name}: Font family array cannot be empty`);
+      } else if (!token.$value.every((v: any) => typeof v === 'string')) {
+        errors.push(`Typography fontFamily ${name}: All font family values must be strings`);
+      }
+    });
+  }
+  
+  // Validate font sizes
+  if (foundation.fontSize) {
+    Object.entries(foundation.fontSize).forEach(([size, token]: [string, any]) => {
+      if (!token.$type || token.$type !== 'dimension') {
+        errors.push(`Typography fontSize ${size}: Invalid or missing $type (expected "dimension")`);
+      }
+
+      if (token.$value === undefined || token.$value === null) {
+        errors.push(`Typography fontSize ${size}: Missing $value`);
+      } else if (typeof token.$value !== 'number') {
+        errors.push(`Typography fontSize ${size}: Value must be a number`);
+      } else if (token.$value <= 0) {
+        errors.push(`Typography fontSize ${size}: Value must be positive`);
+      }
+    });
+  }
+  
+  // Validate font weights
+  if (foundation.fontWeight) {
+    Object.entries(foundation.fontWeight).forEach(([weight, token]: [string, any]) => {
+      if (!token.$type || token.$type !== 'fontWeight') {
+        errors.push(`Typography fontWeight ${weight}: Invalid or missing $type (expected "fontWeight")`);
+      }
+
+      if (token.$value === undefined || token.$value === null) {
+        errors.push(`Typography fontWeight ${weight}: Missing $value`);
+      } else if (typeof token.$value !== 'number') {
+        errors.push(`Typography fontWeight ${weight}: Value must be a number`);
+      } else if (token.$value < 100 || token.$value > 900) {
+        errors.push(`Typography fontWeight ${weight}: Value must be between 100 and 900`);
+      }
+    });
+  }
+  
+  // Validate line heights
+  if (foundation.lineHeight) {
+    Object.entries(foundation.lineHeight).forEach(([height, token]: [string, any]) => {
+      if (!token.$type || token.$type !== 'dimension') {
+        errors.push(`Typography lineHeight ${height}: Invalid or missing $type (expected "dimension")`);
+      }
+
+      if (token.$value === undefined || token.$value === null) {
+        errors.push(`Typography lineHeight ${height}: Missing $value`);
+      } else if (typeof token.$value !== 'number') {
+        errors.push(`Typography lineHeight ${height}: Value must be a number`);
+      } else if (token.$value <= 0) {
+        errors.push(`Typography lineHeight ${height}: Value must be positive`);
+      }
+    });
+  }
+  
+  // Validate letter spacing
+  if (foundation.letterSpacing) {
+    Object.entries(foundation.letterSpacing).forEach(([spacing, token]: [string, any]) => {
+      if (!token.$type || token.$type !== 'dimension') {
+        errors.push(`Typography letterSpacing ${spacing}: Invalid or missing $type (expected "dimension")`);
+      }
+
+      if (token.$value === undefined || token.$value === null) {
+        errors.push(`Typography letterSpacing ${spacing}: Missing $value`);
+      } else if (typeof token.$value !== 'number') {
+        errors.push(`Typography letterSpacing ${spacing}: Value must be a number`);
+      }
+      // Note: letter spacing can be negative, so no min value check
+    });
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+/**
  * Validate all token types
  */
 function validateAllTokens(tokensMap: any): { valid: boolean; errors: string[]; warnings: string[] } {
@@ -878,6 +1194,13 @@ function validateAllTokens(tokensMap: any): { valid: boolean; errors: string[]; 
     const spacingValidation = validateSpacingTokens(tokensMap[TOKEN_FILES.FOUNDATION_SPACING]);
     allErrors.push(...spacingValidation.errors);
     allWarnings.push(...spacingValidation.warnings);
+  }
+
+  // Validate typography (if present)
+  if (tokensMap[TOKEN_FILES.TYPOGRAPHY_FOUNDATION]) {
+    const typographyValidation = validateTypographyTokens(tokensMap[TOKEN_FILES.TYPOGRAPHY_FOUNDATION]);
+    allErrors.push(...typographyValidation.errors);
+    allWarnings.push(...typographyValidation.warnings);
   }
 
   // Validate theme files (if present) - basic validation for now
@@ -965,6 +1288,16 @@ async function fetchAllCurrentTokens(githubToken: string): Promise<any> {
   } catch (e) {
     console.log('Foundation spacing not found in repo (may be new file)');
     tokens[TOKEN_FILES.FOUNDATION_SPACING] = { spacing: { foundation: {} } };
+  }
+  
+  try {
+    tokens[TOKEN_FILES.TYPOGRAPHY_FOUNDATION] = await fetchCurrentTokensFromFile(
+      githubToken, 
+      TOKEN_FILES.TYPOGRAPHY_FOUNDATION
+    );
+  } catch (e) {
+    console.log('Foundation typography not found in repo (may be new file)');
+    tokens[TOKEN_FILES.TYPOGRAPHY_FOUNDATION] = { typography: { foundation: { fontFamily: {}, fontSize: {}, fontWeight: {}, lineHeight: {}, letterSpacing: {} } } };
   }
   
   // Fetch theme files
@@ -1080,6 +1413,47 @@ function hasFoundationRadiusChanges(newTokens: any, currentTokens: any): boolean
 }
 
 /**
+ * Compare foundation typography tokens for differences
+ */
+function hasTypographyChanges(newTokens: any, currentTokens: any): boolean {
+  const newTypo = (newTokens.typography && newTokens.typography.foundation) ? newTokens.typography.foundation : {};
+  const currentTypo = (currentTokens.typography && currentTokens.typography.foundation) ? currentTokens.typography.foundation : {};
+  
+  // Check all typography properties
+  const properties = ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing'];
+  
+  for (const property of properties) {
+    const newProps = newTypo[property] || {};
+    const currentProps = currentTypo[property] || {};
+    
+    // Get all keys from both
+    const allKeys = new Set([
+      ...Object.keys(newProps),
+      ...Object.keys(currentProps)
+    ]);
+    
+    // Check each key
+    for (const key of allKeys) {
+      const newValue = newProps[key] ? newProps[key].$value : undefined;
+      const currentValue = currentProps[key] ? currentProps[key].$value : undefined;
+      
+      // Special handling for arrays (font families)
+      if (Array.isArray(newValue) && Array.isArray(currentValue)) {
+        if (JSON.stringify(newValue) !== JSON.stringify(currentValue)) {
+          console.log(`Typography ${property} change: ${key}: ${JSON.stringify(currentValue)} → ${JSON.stringify(newValue)}`);
+          return true;
+        }
+      } else if (newValue !== currentValue) {
+        console.log(`Typography ${property} change: ${key}: ${currentValue} → ${newValue}`);
+        return true;
+      }
+    }
+  }
+  
+  return false;
+}
+
+/**
  * Compare all token types for differences
  * Returns object with file paths that have changes
  */
@@ -1145,6 +1519,24 @@ function detectChanges(newTokensMap: any, currentTokensMap: any): { hasChanges: 
     
     if (hasSpacingChanges) {
       changedFiles.push(TOKEN_FILES.FOUNDATION_SPACING);
+    }
+  }
+  
+  // Check typography (if present in new tokens)
+  if (newTokensMap[TOKEN_FILES.TYPOGRAPHY_FOUNDATION]) {
+    const newTypo = newTokensMap[TOKEN_FILES.TYPOGRAPHY_FOUNDATION];
+    const currentTypo = currentTokensMap[TOKEN_FILES.TYPOGRAPHY_FOUNDATION];
+    
+    // Check if there are any typography tokens extracted
+    const hasTypoTokens = newTypo.typography && newTypo.typography.foundation &&
+      (Object.keys(newTypo.typography.foundation.fontFamily || {}).length > 0 ||
+       Object.keys(newTypo.typography.foundation.fontSize || {}).length > 0 ||
+       Object.keys(newTypo.typography.foundation.fontWeight || {}).length > 0 ||
+       Object.keys(newTypo.typography.foundation.lineHeight || {}).length > 0 ||
+       Object.keys(newTypo.typography.foundation.letterSpacing || {}).length > 0);
+    
+    if (hasTypoTokens && hasTypographyChanges(newTypo, currentTypo)) {
+      changedFiles.push(TOKEN_FILES.TYPOGRAPHY_FOUNDATION);
     }
   }
   

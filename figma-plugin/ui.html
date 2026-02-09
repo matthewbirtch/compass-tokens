@@ -97,9 +97,11 @@
           <li>✅ Each mode creates separate theme file (denim.json, sapphire.json, etc.)</li>
         </ul>
         
-        <p><strong>Not synced yet:</strong></p>
+        <p><strong>Foundation Typography:</strong></p>
         <ul>
-          <li>❌ Typography variables</li>
+          <li>✅ Pattern: <code>font-family/heading</code>, <code>font-size/200</code>, <code>font-weight/bold</code></li>
+          <li>✅ Font families, sizes, weights, line heights, letter spacing</li>
+          <li>✅ Output: Font families as arrays, dimensions as numbers</li>
         </ul>
       </div>
     </details>
@@ -246,6 +248,7 @@
           const semanticCount = msg.data.semanticAttachment.processed;
           const radiusCount = msg.data.foundationRadius ? msg.data.foundationRadius.processed : 0;
           const spacingCount = msg.data.foundationSpacing ? msg.data.foundationSpacing.processed : 0;
+          const typographyCount = msg.data.foundationTypography ? msg.data.foundationTypography.processed : 0;
           const themeCount = msg.data.themes && msg.data.themes.processed ? msg.data.themes.processed : 0;
           const themeModesCount = msg.data.themes && msg.data.themes.modes ? msg.data.themes.modes : 0;
           
@@ -254,6 +257,7 @@
           if (semanticCount > 0) detailParts.push(`Attachment: ${semanticCount}`);
           if (radiusCount > 0) detailParts.push(`Radius: ${radiusCount}`);
           if (spacingCount > 0) detailParts.push(`Spacing: ${spacingCount}`);
+          if (typographyCount > 0) detailParts.push(`Typography: ${typographyCount}`);
           if (themeCount > 0) detailParts.push(`Themes: ${themeCount} tokens across ${themeModesCount} modes`);
           
           const details = detailParts.join(' | ') + ` | Total: ${totalTokens}`;
