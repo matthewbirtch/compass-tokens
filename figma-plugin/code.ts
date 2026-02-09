@@ -554,6 +554,12 @@ async function extractThemeTokens() {
   for (const variable of colorVariables) {
     if (!themeCollections.has(variable.variableCollectionId)) continue;
     
+    // Skip opacity variants (e.g., sidebar-bg-64, button-color-80)
+    if (/-(8|16|24|32|40|48|56|64|72|80|88|96)$/.test(variable.name)) {
+      console.log(`Skipping opacity variant: "${variable.name}"`);
+      continue;
+    }
+    
     const collection = themeCollections.get(variable.variableCollectionId);
     console.log(`Processing theme variable: "${variable.name}"`);
     
@@ -614,6 +620,42 @@ async function extractThemeTokens() {
   return {
     tokens: themeTokens,
     stats
+  };
+}
+
+/**
+ * Sort theme tokens to match existing order in repository
+ */
+function sortThemeTokens(newTokens: any, currentTokens: any, themeName: string): any {
+  const themeKey = themeName.toLowerCase();
+  const newVars = newTokens.color.theme[themeKey];
+  const currentVars = currentTokens.color && currentTokens.color.theme && currentTokens.color.theme[themeKey]
+    ? currentTokens.color.theme[themeKey]
+    : {};
+  
+  // Get order from current file
+  const currentOrder = Object.keys(currentVars);
+  const newKeys = Object.keys(newVars);
+  
+  // Sort: existing keys in their current order, then new keys alphabetically
+  const sortedKeys = [
+    ...currentOrder.filter(key => newKeys.includes(key)),  // Existing keys in original order
+    ...newKeys.filter(key => !currentOrder.includes(key)).sort()  // New keys alphabetically
+  ];
+  
+  // Rebuild in sorted order
+  const sorted: any = {};
+  sortedKeys.forEach(key => {
+    sorted[key] = newVars[key];
+  });
+  
+  return {
+    ...newTokens,
+    color: {
+      theme: {
+        [themeKey]: sorted
+      }
+    }
   };
 }
 
@@ -1246,6 +1288,18 @@ figma.ui.onmessage = async (msg) => {
         // Fetch current tokens from repository
         figma.ui.postMessage({ type: 'progress', message: 'Checking for changes...' });
         const currentTokensMap = await fetchAllCurrentTokens(githubToken);
+        
+        // Sort theme tokens to match existing order in repository
+        for (const themeName of Object.keys(THEME_MODE_TO_FILE)) {
+          const filePath = THEME_MODE_TO_FILE[themeName];
+          if (tokensMap[filePath] && currentTokensMap[filePath]) {
+            tokensMap[filePath] = sortThemeTokens(
+              tokensMap[filePath],
+              currentTokensMap[filePath],
+              themeName
+            );
+          }
+        }
         
         // Compare for changes
         const changeDetection = detectChanges(tokensMap, currentTokensMap);
