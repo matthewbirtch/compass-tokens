@@ -22,15 +22,16 @@ jobs:
       
       - name: Update token files
         run: |
-          # Parse the files payload and update each file using Node.js to preserve key order
+          # Parse the files payload - files are pre-stringified to preserve key order
           node -e '
             const files = JSON.parse(process.env.FILES);
             const fs = require("fs");
             
             Object.entries(files).forEach(([filepath, content]) => {
               console.log(`Updating ${filepath}`);
-              // Use JSON.stringify with 2-space indentation to preserve key order
-              fs.writeFileSync(filepath, JSON.stringify(content, null, 2) + "\n");
+              // Content is already stringified with correct key order from plugin
+              // Just write it directly with newline
+              fs.writeFileSync(filepath, content + "\n");
             });
           '
         env:

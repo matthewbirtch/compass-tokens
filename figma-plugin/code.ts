@@ -338,6 +338,46 @@ function findClosestLineHeightScale(pixelValue: number, fontSize: number): strin
 }
 
 /**
+ * Custom JSON stringify that preserves key order exactly as inserted
+ * JavaScript's JSON.stringify reorders numeric-like keys, which breaks our sorting
+ */
+function stringifyPreservingOrder(obj: any, indent: number = 2): string {
+  const indentStr = ' '.repeat(indent);
+  const lines: string[] = [];
+  
+  function stringify(value: any, depth: number): string {
+    const currentIndent = indentStr.repeat(depth);
+    const nextIndent = indentStr.repeat(depth + 1);
+    
+    if (value === null) return 'null';
+    if (typeof value === 'string') return JSON.stringify(value);
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    
+    if (Array.isArray(value)) {
+      if (value.length === 0) return '[]';
+      const items = value.map(item => `${nextIndent}${stringify(item, depth + 1)}`);
+      return `[\n${items.join(',\n')}\n${currentIndent}]`;
+    }
+    
+    if (typeof value === 'object') {
+      const keys = Object.keys(value);
+      if (keys.length === 0) return '{}';
+      
+      const pairs = keys.map(key => {
+        const val = stringify(value[key], depth + 1);
+        return `${nextIndent}${JSON.stringify(key)}: ${val}`;
+      });
+      
+      return `{\n${pairs.join(',\n')}\n${currentIndent}}`;
+    }
+    
+    return 'null';
+  }
+  
+  return stringify(obj, 0);
+}
+
+/**
  * Extract semantic typography tokens from Figma Text Styles
  */
 async function extractSemanticTypographyTokens() {
@@ -455,6 +495,10 @@ async function extractSemanticTypographyTokens() {
     bodyCount: Object.keys(tokens.typography.semantic.body).length,
     codeCount: Object.keys(tokens.typography.semantic.code).length
   });
+  
+  // Debug: show first 10 heading keys to verify order
+  const headingKeys = Object.keys(tokens.typography.semantic.heading);
+  console.log(`First 10 heading keys (to verify order):`, headingKeys.slice(0, 10));
   
   return { tokens, stats };
 }
@@ -2029,9 +2073,10 @@ async function triggerGitHubSync(tokensMap: any, changedFiles: string[], githubT
   const url = `https://api.github.com/repos/${GITHUB_REPO}/dispatches`;
   
   // Prepare file updates for only changed files
+  // Pre-stringify to preserve key order through GitHub API transmission
   const fileUpdates: any = {};
   for (const filePath of changedFiles) {
-    fileUpdates[filePath] = tokensMap[filePath];
+    fileUpdates[filePath] = stringifyPreservingOrder(tokensMap[filePath], 2);
   }
   
   const response = await fetch(url, {
@@ -2066,7 +2111,7 @@ async function triggerGitHubSync(tokensMap: any, changedFiles: string[], githubT
 async function saveTokensLocally(tokensMap: any) {
   // Send each file to UI for download
   for (const [filePath, tokens] of Object.entries(tokensMap)) {
-    const jsonContent = JSON.stringify(tokens, null, 2);
+    const jsonContent = stringifyPreservingOrder(tokens, 2);
     const filename = filePath.split('/').pop() || 'tokens.json';
     
     figma.ui.postMessage({
