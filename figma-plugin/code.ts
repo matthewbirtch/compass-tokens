@@ -34,10 +34,10 @@ const FOUNDATION_COLOR_PATTERN = /^(blue|indigo|neutral|cyan|purple|teal|yellow|
 const SEMANTIC_ATTACHMENT_PATTERN = /^attachment\/(blue|green|orange|red|grey)$/;
 const FOUNDATION_RADIUS_PATTERN = /^radius-(xs|s|m|l|xl|full)$/;
 const FOUNDATION_SPACING_PATTERN = /^spacing-(xxxxs|xs|m|l|xl|xxl|xxxl|xxxxl)$/;
-const TYPOGRAPHY_FONT_FAMILY_PATTERN = /^font-family\/(heading|body|mono)$/;
-const TYPOGRAPHY_FONT_SIZE_PATTERN = /^font-size\/(25|50|75|100|200|300|400|500|600|700|800|900|1000)$/;
-const TYPOGRAPHY_FONT_WEIGHT_PATTERN = /^font-weight\/(light|regular|semibold|bold)$/;
-const TYPOGRAPHY_LINE_HEIGHT_PATTERN = /^line-height\/(16|20|24|28|30|36|40|44|48)$/;
+const TYPOGRAPHY_FONT_FAMILY_PATTERN = /^font\/family\/(heading|body|code)$/;
+const TYPOGRAPHY_FONT_SIZE_PATTERN = /^font\/size\/(25|50|75|100|200|300|400|500|600|700|800|900|1000)$/;
+const TYPOGRAPHY_FONT_WEIGHT_PATTERN = /^font\/weight\/(light|regular|semi-bold|bold)$/;
+const TYPOGRAPHY_LINE_HEIGHT_PATTERN = /^line-height\/(heading|body)\/\d+$/;
 const TYPOGRAPHY_LETTER_SPACING_PATTERN = /^letter-spacing\/(tight-2|tight-1|normal|wide-1|wide-2)$/;
 
 // Token category definitions
@@ -57,6 +57,7 @@ const TOKEN_CATEGORIES: TokenCategory[] = [
   { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_FONT_FAMILY_PATTERN, variableType: 'STRING', subtype: 'fontFamily' },
   { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_FONT_SIZE_PATTERN, variableType: 'FLOAT', subtype: 'fontSize' },
   { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_FONT_WEIGHT_PATTERN, variableType: 'FLOAT', subtype: 'fontWeight' },
+  { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_FONT_WEIGHT_PATTERN, variableType: 'STRING', subtype: 'fontWeight' },
   { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_LINE_HEIGHT_PATTERN, variableType: 'FLOAT', subtype: 'lineHeight' },
   { type: 'typography-foundation', path: TOKEN_FILES.TYPOGRAPHY_FOUNDATION, pattern: TYPOGRAPHY_LETTER_SPACING_PATTERN, variableType: 'FLOAT', subtype: 'letterSpacing' }
 ];
@@ -195,17 +196,22 @@ function parseFontFamily(value: string): string[] {
  * Parse typography variable name into property type and value
  */
 function parseTypographyVariableName(name: string): { property: string; value: string } | null {
-  // Font family: font-family/heading
-  let match = name.match(/^font-family\/([a-z]+)$/i);
+  // Font family: font/family/heading
+  let match = name.match(/^font\/family\/([a-z-]+)$/i);
   if (match) {
+    let familyName = match[1].toLowerCase();
+    // Map "code" to "mono" to match existing token structure
+    if (familyName === 'code') {
+      familyName = 'mono';
+    }
     return {
       property: 'fontFamily',
-      value: match[1].toLowerCase()
+      value: familyName
     };
   }
   
-  // Font size: font-size/200
-  match = name.match(/^font-size\/(\d+)$/i);
+  // Font size: font/size/200
+  match = name.match(/^font\/size\/(\d+)$/i);
   if (match) {
     return {
       property: 'fontSize',
@@ -213,17 +219,23 @@ function parseTypographyVariableName(name: string): { property: string; value: s
     };
   }
   
-  // Font weight: font-weight/bold
-  match = name.match(/^font-weight\/([a-z]+)$/i);
+  // Font weight: font/weight/bold or font/weight/semi-bold
+  match = name.match(/^font\/weight\/([a-z-]+)$/i);
   if (match) {
+    let weightName = match[1].toLowerCase();
+    // Map "semi-bold" to "semibold" to match existing token structure
+    if (weightName === 'semi-bold') {
+      weightName = 'semibold';
+    }
     return {
       property: 'fontWeight',
-      value: match[1].toLowerCase()
+      value: weightName
     };
   }
   
-  // Line height: line-height/24
-  match = name.match(/^line-height\/(\d+)$/i);
+  // Line height: line-height/heading/24 or line-height/body/200
+  // We only care about the numeric value, not the heading/body category
+  match = name.match(/^line-height\/(?:heading|body)\/(\d+)$/i);
   if (match) {
     return {
       property: 'lineHeight',
@@ -270,14 +282,31 @@ function buildFoundationTypographyTokens(variables: Variable[]): any {
     const modeId = Object.keys(variable.valuesByMode)[0];
     const varValue = variable.valuesByMode[modeId];
     
+    console.log(`  Building token for ${variable.name}: property=${property}, value=${value}, varValue type=${typeof varValue}, varValue=${JSON.stringify(varValue)}`);
+    
     if (property === 'fontFamily') {
       // Handle font family (STRING type)
       if (typeof varValue === 'string') {
-        const fontStack = parseFontFamily(varValue);
+        console.log(`  ✓ Font family is string: "${varValue}"`);
+        let fontStack = parseFontFamily(varValue);
+        
+        // Add default fallbacks if not already present
+        if (fontStack.length === 1) {
+          if (value === 'mono' || value === 'code') {
+            fontStack.push('monospace');
+          } else {
+            fontStack.push('sans-serif');
+          }
+          console.log(`  ✓ Added fallback: ${fontStack.join(', ')}`);
+        }
+        
         tokens.typography.foundation.fontFamily[value] = {
           $type: "fontFamily",
           $value: fontStack
         };
+        console.log(`  ✓ Added fontFamily ${value}:`, tokens.typography.foundation.fontFamily[value]);
+      } else {
+        console.log(`  ❌ Font family is not a string, it's ${typeof varValue}`);
       }
     } else if (property === 'fontSize') {
       // Handle font size (FLOAT type)
@@ -288,20 +317,60 @@ function buildFoundationTypographyTokens(variables: Variable[]): any {
         };
       }
     } else if (property === 'fontWeight') {
-      // Handle font weight (FLOAT type)
+      // Handle font weight (FLOAT or STRING type)
       if (typeof varValue === 'number') {
         tokens.typography.foundation.fontWeight[value] = {
           $type: "fontWeight",
           $value: varValue
         };
+      } else if (typeof varValue === 'string') {
+        // Handle string weight values - can be numeric strings or weight names
+        const trimmedValue = varValue.trim();
+        
+        // Try to parse as number first
+        const parsedNumber = parseInt(trimmedValue);
+        if (!isNaN(parsedNumber) && parsedNumber >= 100 && parsedNumber <= 900) {
+          console.log(`  ✓ Parsed font weight "${varValue}" to ${parsedNumber}`);
+          tokens.typography.foundation.fontWeight[value] = {
+            $type: "fontWeight",
+            $value: parsedNumber
+          };
+        } else {
+          // Map named weight strings to numeric values
+          const normalizedWeight = trimmedValue.toLowerCase().replace(/\s+/g, '');
+          const weightMap: { [key: string]: number } = {
+            'light': 300,
+            'regular': 400,
+            'semibold': 600,
+            'bold': 700
+          };
+          const numericWeight = weightMap[normalizedWeight];
+          if (numericWeight) {
+            console.log(`  ✓ Mapped font weight "${varValue}" to ${numericWeight}`);
+            tokens.typography.foundation.fontWeight[value] = {
+              $type: "fontWeight",
+              $value: numericWeight
+            };
+          } else {
+            console.log(`  ❌ Unknown font weight string: "${varValue}" (normalized: "${normalizedWeight}")`);
+          }
+        }
       }
     } else if (property === 'lineHeight') {
       // Handle line height (FLOAT type)
+      // Use the actual line height value as the key, not the variable name number
       if (typeof varValue === 'number') {
-        tokens.typography.foundation.lineHeight[value] = {
-          $type: "dimension",
-          $value: varValue
-        };
+        const lineHeightKey = String(varValue);
+        // Only add if not already present (avoid duplicates from heading/body variants)
+        if (!tokens.typography.foundation.lineHeight[lineHeightKey]) {
+          tokens.typography.foundation.lineHeight[lineHeightKey] = {
+            $type: "dimension",
+            $value: varValue
+          };
+          console.log(`  ✓ Added lineHeight ${lineHeightKey}`);
+        } else {
+          console.log(`  ⚠️ LineHeight ${lineHeightKey} already exists, skipping`);
+        }
       }
     } else if (property === 'letterSpacing') {
       // Handle letter spacing (FLOAT type, can be negative)
@@ -314,17 +383,36 @@ function buildFoundationTypographyTokens(variables: Variable[]): any {
     }
   }
   
-  // Sort font sizes numerically
+  // Sort font sizes numerically (smallest to largest)
   if (Object.keys(tokens.typography.foundation.fontSize).length > 0) {
     const sortedSizes: any = {};
-    const sizeKeys = Object.keys(tokens.typography.foundation.fontSize).sort((a, b) => Number(a) - Number(b));
+    const sizeKeys = Object.keys(tokens.typography.foundation.fontSize).sort((a, b) => {
+      const numA = Number(a);
+      const numB = Number(b);
+      return numA - numB;
+    });
     sizeKeys.forEach(key => {
       sortedSizes[key] = tokens.typography.foundation.fontSize[key];
     });
     tokens.typography.foundation.fontSize = sortedSizes;
   }
   
-  // Sort line heights numerically
+  // Sort font weights numerically (smallest to largest)
+  if (Object.keys(tokens.typography.foundation.fontWeight).length > 0) {
+    const sortedWeights: any = {};
+    // Sort by the actual numeric value, not the key name
+    const weightKeys = Object.keys(tokens.typography.foundation.fontWeight).sort((a, b) => {
+      const valueA = tokens.typography.foundation.fontWeight[a].$value;
+      const valueB = tokens.typography.foundation.fontWeight[b].$value;
+      return valueA - valueB;
+    });
+    weightKeys.forEach(key => {
+      sortedWeights[key] = tokens.typography.foundation.fontWeight[key];
+    });
+    tokens.typography.foundation.fontWeight = sortedWeights;
+  }
+  
+  // Sort line heights numerically (smallest to largest)
   if (Object.keys(tokens.typography.foundation.lineHeight).length > 0) {
     const sortedHeights: any = {};
     const heightKeys = Object.keys(tokens.typography.foundation.lineHeight).sort((a, b) => Number(a) - Number(b));
@@ -332,6 +420,20 @@ function buildFoundationTypographyTokens(variables: Variable[]): any {
       sortedHeights[key] = tokens.typography.foundation.lineHeight[key];
     });
     tokens.typography.foundation.lineHeight = sortedHeights;
+  }
+  
+  // Sort letter spacing numerically (smallest to largest, including negatives)
+  if (Object.keys(tokens.typography.foundation.letterSpacing).length > 0) {
+    const sortedSpacing: any = {};
+    const spacingKeys = Object.keys(tokens.typography.foundation.letterSpacing).sort((a, b) => {
+      const valueA = tokens.typography.foundation.letterSpacing[a].$value;
+      const valueB = tokens.typography.foundation.letterSpacing[b].$value;
+      return valueA - valueB;
+    });
+    spacingKeys.forEach(key => {
+      sortedSpacing[key] = tokens.typography.foundation.letterSpacing[key];
+    });
+    tokens.typography.foundation.letterSpacing = sortedSpacing;
   }
   
   return tokens;

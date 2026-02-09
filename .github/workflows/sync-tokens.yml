@@ -26,10 +26,12 @@ jobs:
           FILES='${{ toJson(github.event.client_payload.files) }}'
           echo "Received files payload"
           
-          # Extract and update each file
-          echo "$FILES" | jq -r 'to_entries | .[] | "\(.key)|\(.value)"' | while IFS='|' read -r filepath content; do
+          # Extract and update each file - use jq with 2-space indentation to preserve key order
+          echo "$FILES" | jq -r 'to_entries | .[] | @json' | while read -r entry; do
+            filepath=$(echo "$entry" | jq -r '.key')
+            content=$(echo "$entry" | jq '.value')
             echo "Updating $filepath"
-            echo "$content" | jq '.' > "$filepath"
+            echo "$content" | jq --indent 2 '.' > "$filepath"
           done
       
       - name: Validate tokens
