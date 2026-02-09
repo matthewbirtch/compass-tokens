@@ -22,17 +22,19 @@ jobs:
       
       - name: Update token files
         run: |
-          # Parse the files payload and update each file
-          FILES='${{ toJson(github.event.client_payload.files) }}'
-          echo "Received files payload"
-          
-          # Extract and update each file - use jq with 2-space indentation to preserve key order
-          echo "$FILES" | jq -r 'to_entries | .[] | @json' | while read -r entry; do
-            filepath=$(echo "$entry" | jq -r '.key')
-            content=$(echo "$entry" | jq '.value')
-            echo "Updating $filepath"
-            echo "$content" | jq --indent 2 '.' > "$filepath"
-          done
+          # Parse the files payload and update each file using Node.js to preserve key order
+          node -e '
+            const files = JSON.parse(process.env.FILES);
+            const fs = require("fs");
+            
+            Object.entries(files).forEach(([filepath, content]) => {
+              console.log(`Updating ${filepath}`);
+              // Use JSON.stringify with 2-space indentation to preserve key order
+              fs.writeFileSync(filepath, JSON.stringify(content, null, 2) + "\n");
+            });
+          '
+        env:
+          FILES: ${{ toJson(github.event.client_payload.files) }}
       
       - name: Validate tokens
         run: node scripts/validate-tokens.js
