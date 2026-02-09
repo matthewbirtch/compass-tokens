@@ -758,9 +758,25 @@ This repository includes a **Figma plugin** to sync design tokens from Figma to 
 - ✅ 5 colors (blue, green, orange, red, grey)
 - ✅ Output: Foundation color references ({color.foundation.blue.300})
 
+**Foundation Radius**:
+- ✅ Pattern: `radius-xs`, `radius-full`
+- ✅ 6 sizes (xs, s, m, l, xl, full)
+- ✅ Output: Numeric values (2, 4, 8) or "50%" for full
+
+**Foundation Spacing**:
+- ✅ Pattern: `spacing-xxxxs`, `spacing-xl`
+- ✅ 8 sizes (xxxxs, xs, m, l, xl, xxl, xxxl, xxxxl)
+- ✅ Output: Numeric values (4, 8, 12, etc.)
+
+**Theme Colors** (via Variable Modes):
+- ✅ All 5 themes: Denim, Sapphire, Quartz, Onyx, Indigo
+- ✅ All theme variables (sidebar-bg, button-bg, center-channel-bg, etc.)
+- ✅ Output: HEX values or foundation references
+- ✅ Automatically detects collection with theme modes
+- ✅ Each mode creates/updates separate theme file (denim.json, sapphire.json, etc.)
+
 **Not synced yet**:
-- ❌ Theme variables (Denim/Button BG)
-- ❌ Typography, spacing, radius tokens
+- ❌ Typography variables
 
 #### Validation
 

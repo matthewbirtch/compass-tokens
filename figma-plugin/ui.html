@@ -42,6 +42,7 @@
       <div class="progress-card">
         <div id="progress-message">Processing...</div>
         <div id="progress-details"></div>
+        <div id="files-list" style="margin-top: 8px; font-size: 11px; color: #666;"></div>
       </div>
     </div>
 
@@ -88,11 +89,17 @@
           <li>✅ Output: Foundation references ({color.foundation.blue.300})</li>
         </ul>
         
+        <p><strong>Theme Colors:</strong></p>
+        <ul>
+          <li>✅ Extracts from Variable Modes (Denim, Sapphire, Quartz, Onyx, Indigo)</li>
+          <li>✅ All theme variables (sidebar-bg, button-bg, etc.)</li>
+          <li>✅ Output: HEX values or foundation references</li>
+          <li>✅ Each mode creates separate theme file (denim.json, sapphire.json, etc.)</li>
+        </ul>
+        
         <p><strong>Not synced yet:</strong></p>
         <ul>
-          <li>❌ Theme variables (Denim/Button BG)</li>
           <li>❌ Typography variables</li>
-          <li>❌ Spacing/Radius tokens</li>
         </ul>
       </div>
     </details>
@@ -136,14 +143,23 @@
     }
 
     // Show progress
-    function showProgress(message, details = '') {
+    function showProgress(message, details = '', files = []) {
       const section = document.getElementById('progress-section');
       const messageEl = document.getElementById('progress-message');
       const detailsEl = document.getElementById('progress-details');
+      const filesEl = document.getElementById('files-list');
       
       section.style.display = 'block';
       messageEl.textContent = message;
       detailsEl.textContent = details;
+      
+      if (files && files.length > 0) {
+        filesEl.innerHTML = '<strong>Files:</strong><br>' + 
+          files.map(f => '• ' + f.split('/').pop()).join('<br>');
+        filesEl.style.display = 'block';
+      } else {
+        filesEl.style.display = 'none';
+      }
     }
 
     // Hide progress
@@ -158,9 +174,9 @@
     }
 
     // Show success
-    function showSuccess(message) {
-      showProgress('✅ Success!', message);
-      setTimeout(hideProgress, 3000);
+    function showSuccess(message, files = []) {
+      showProgress('✅ Success!', message, files);
+      setTimeout(hideProgress, 5000);
     }
 
     // Handle sync to GitHub
@@ -229,11 +245,18 @@
           const foundationCount = msg.data.foundationColors.processed;
           const semanticCount = msg.data.semanticAttachment.processed;
           const radiusCount = msg.data.foundationRadius ? msg.data.foundationRadius.processed : 0;
+          const spacingCount = msg.data.foundationSpacing ? msg.data.foundationSpacing.processed : 0;
+          const themeCount = msg.data.themes && msg.data.themes.processed ? msg.data.themes.processed : 0;
+          const themeModesCount = msg.data.themes && msg.data.themes.modes ? msg.data.themes.modes : 0;
           
-          let details = `Foundation colors: ${foundationCount}`;
-          if (semanticCount > 0) details += ` | Semantic attachment: ${semanticCount}`;
-          if (radiusCount > 0) details += ` | Radius: ${radiusCount}`;
-          details += ` | Total: ${totalTokens}`;
+          let detailParts = [];
+          if (foundationCount > 0) detailParts.push(`Colors: ${foundationCount}`);
+          if (semanticCount > 0) detailParts.push(`Attachment: ${semanticCount}`);
+          if (radiusCount > 0) detailParts.push(`Radius: ${radiusCount}`);
+          if (spacingCount > 0) detailParts.push(`Spacing: ${spacingCount}`);
+          if (themeCount > 0) detailParts.push(`Themes: ${themeCount} tokens across ${themeModesCount} modes`);
+          
+          const details = detailParts.join(' | ') + ` | Total: ${totalTokens}`;
           
           showProgress('Tokens extracted!', details);
           break;
@@ -241,11 +264,10 @@
         case 'sync-success':
           const totalSynced = msg.data.totalTokens;
           const filesChanged = msg.data.changedFiles.length;
-          const fileList = msg.data.changedFiles.map(f => f.split('/').pop()).join(', ');
           
           showSuccess(
-            `Successfully synced ${totalSynced} tokens across ${filesChanged} file(s)! Pull request created.\n\n` +
-            `Files: ${fileList}`
+            `Successfully synced ${totalSynced} tokens!`,
+            msg.data.changedFiles
           );
           updateStatus(true, msg.data.timestamp);
           break;

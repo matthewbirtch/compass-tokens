@@ -119,10 +119,27 @@ Last sync: 2/8/2026, 4:30 PM
 - ✅ Output: Foundation references ({color.foundation.blue.300})
 - ✅ File: `tokens/src/semantic/attachment.json`
 
+**Foundation Radius**:
+- ✅ Pattern: `radius-xs`, `radius-full`
+- ✅ 6 sizes: xs, s, m, l, xl, full
+- ✅ Output: Numeric values (2, 4, 8) or "50%" for full
+- ✅ File: `tokens/src/foundation/radius.json`
+
+**Foundation Spacing**:
+- ✅ Pattern: `spacing-xxxxs`, `spacing-xl`
+- ✅ 8 sizes: xxxxs, xs, m, l, xl, xxl, xxxl, xxxxl
+- ✅ Output: Numeric values (4, 8, 12, etc.)
+- ✅ File: `tokens/src/foundation/spacing.json`
+
+**Theme Colors (via Variable Modes)**:
+- ✅ All 5 themes: Denim, Sapphire, Quartz, Onyx, Indigo
+- ✅ All theme variables (sidebar-bg, button-bg, center-channel-bg, etc.)
+- ✅ Output: HEX values or foundation references
+- ✅ Automatically detects collection with theme modes
+- ✅ Files: `tokens/src/themes/denim.json`, `sapphire.json`, `quartz.json`, `onyx.json`, `indigo.json`
+
 **Not synced yet**:
-- ❌ Theme variables (e.g., `Denim/Button BG`)
 - ❌ Typography variables
-- ❌ Spacing/Radius tokens
 - ❌ Capitalized variants (e.g., `Blue/500`)
 
 ---

@@ -11,7 +11,21 @@ const TOKEN_FILES = {
   FOUNDATION_COLOR: 'tokens/src/foundation/color.json',
   SEMANTIC_ATTACHMENT: 'tokens/src/semantic/attachment.json',
   FOUNDATION_RADIUS: 'tokens/src/foundation/radius.json',
-  FOUNDATION_SPACING: 'tokens/src/foundation/spacing.json'
+  FOUNDATION_SPACING: 'tokens/src/foundation/spacing.json',
+  THEME_DENIM: 'tokens/src/themes/denim.json',
+  THEME_SAPPHIRE: 'tokens/src/themes/sapphire.json',
+  THEME_QUARTZ: 'tokens/src/themes/quartz.json',
+  THEME_ONYX: 'tokens/src/themes/onyx.json',
+  THEME_INDIGO: 'tokens/src/themes/indigo.json'
+};
+
+// Theme mode to file mapping
+const THEME_MODE_TO_FILE: { [key: string]: string } = {
+  'Denim': TOKEN_FILES.THEME_DENIM,
+  'Sapphire': TOKEN_FILES.THEME_SAPPHIRE,
+  'Quartz': TOKEN_FILES.THEME_QUARTZ,
+  'Onyx': TOKEN_FILES.THEME_ONYX,
+  'Indigo': TOKEN_FILES.THEME_INDIGO
 };
 
 // Token patterns
@@ -486,6 +500,124 @@ async function extractAllTokens() {
 }
 
 /**
+ * Extract theme tokens from Figma variable modes
+ */
+async function extractThemeTokens() {
+  const colorVariables = await figma.variables.getLocalVariablesAsync('COLOR');
+  
+  // Find the theme collection by checking for theme mode names
+  const themeCollections = new Map<string, any>();
+  
+  for (const variable of colorVariables) {
+    const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
+    if (!collection) continue;
+    
+    // Check if this collection has theme modes
+    const modeNames = collection.modes.map(m => m.name);
+    const hasThemeModes = modeNames.some(name => 
+      ['Denim', 'Sapphire', 'Quartz', 'Onyx', 'Indigo'].includes(name)
+    );
+    
+    if (hasThemeModes && !themeCollections.has(collection.id)) {
+      themeCollections.set(collection.id, collection);
+      console.log(`Found theme collection: "${collection.name}" with modes:`, modeNames);
+    }
+  }
+  
+  if (themeCollections.size === 0) {
+    console.log('No theme collections found');
+    return { tokens: {}, stats: { processed: 0, skipped: 0, modes: 0 } };
+  }
+  
+  // Initialize theme token structures for each theme
+  const themeTokens: any = {};
+  Object.keys(THEME_MODE_TO_FILE).forEach(themeName => {
+    const filePath = THEME_MODE_TO_FILE[themeName];
+    themeTokens[filePath] = {
+      $schema: "https://tr.designtokens.org/format/",
+      color: {
+        theme: {
+          [themeName.toLowerCase()]: {}
+        }
+      }
+    };
+  });
+  
+  const stats = {
+    processed: 0,
+    skipped: 0,
+    modes: 0,
+    variablesPerMode: {} as any
+  };
+  
+  // Process theme variables
+  for (const variable of colorVariables) {
+    if (!themeCollections.has(variable.variableCollectionId)) continue;
+    
+    const collection = themeCollections.get(variable.variableCollectionId);
+    console.log(`Processing theme variable: "${variable.name}"`);
+    
+    // Process each mode
+    for (const mode of collection.modes) {
+      const modeName = mode.name;
+      
+      // Check if this is a theme we're tracking
+      if (!THEME_MODE_TO_FILE[modeName]) {
+        continue;
+      }
+      
+      const filePath = THEME_MODE_TO_FILE[modeName];
+      const themeName = modeName.toLowerCase();
+      const value = variable.valuesByMode[mode.modeId];
+      
+      if (!value) continue;
+      
+      // Initialize stats for this mode
+      if (!stats.variablesPerMode[modeName]) {
+        stats.variablesPerMode[modeName] = 0;
+        stats.modes++;
+      }
+      
+      let tokenValue: string;
+      
+      // Handle alias (reference to another variable)
+      if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
+        const aliasedVariable = await figma.variables.getVariableByIdAsync(value.id);
+        if (aliasedVariable) {
+          tokenValue = buildReference(aliasedVariable.name);
+          console.log(`  ${modeName}: ${variable.name} → ${tokenValue}`);
+        } else {
+          stats.skipped++;
+          continue;
+        }
+      } else if (typeof value === 'object' && 'r' in value) {
+        // Direct color value
+        const rgba = value as RGBA;
+        tokenValue = rgbToHex(rgba);
+        console.log(`  ${modeName}: ${variable.name} → ${tokenValue}`);
+      } else {
+        stats.skipped++;
+        continue;
+      }
+      
+      // Add token to theme
+      themeTokens[filePath].color.theme[themeName][variable.name] = {
+        $type: "color",
+        $value: tokenValue
+      };
+      
+      stats.variablesPerMode[modeName]++;
+      stats.processed++;
+    }
+  }
+  
+  return {
+    tokens: themeTokens,
+    stats
+  };
+}
+
+/**
  * Validate foundation color tokens
  */
 function validateFoundationTokens(tokens: any): { valid: boolean; errors: string[]; warnings: string[] } {
@@ -691,6 +823,18 @@ function validateAllTokens(tokensMap: any): { valid: boolean; errors: string[]; 
     allWarnings.push(...spacingValidation.warnings);
   }
 
+  // Validate theme files (if present) - basic validation for now
+  Object.keys(THEME_MODE_TO_FILE).forEach(themeName => {
+    const filePath = THEME_MODE_TO_FILE[themeName];
+    if (tokensMap[filePath]) {
+      // Basic structure check
+      const tokens = tokensMap[filePath];
+      if (!tokens.color || !tokens.color.theme || !tokens.color.theme[themeName.toLowerCase()]) {
+        allErrors.push(`Theme ${themeName}: Invalid token structure`);
+      }
+    }
+  });
+
   return {
     valid: allErrors.length === 0,
     errors: allErrors,
@@ -764,6 +908,17 @@ async function fetchAllCurrentTokens(githubToken: string): Promise<any> {
   } catch (e) {
     console.log('Foundation spacing not found in repo (may be new file)');
     tokens[TOKEN_FILES.FOUNDATION_SPACING] = { spacing: { foundation: {} } };
+  }
+  
+  // Fetch theme files
+  for (const themeName of Object.keys(THEME_MODE_TO_FILE)) {
+    const filePath = THEME_MODE_TO_FILE[themeName];
+    try {
+      tokens[filePath] = await fetchCurrentTokensFromFile(githubToken, filePath);
+    } catch (e) {
+      console.log(`Theme ${themeName} not found in repo (may be new file)`);
+      tokens[filePath] = { color: { theme: { [themeName.toLowerCase()]: {} } } };
+    }
   }
   
   return tokens;
@@ -936,6 +1091,42 @@ function detectChanges(newTokensMap: any, currentTokensMap: any): { hasChanges: 
     }
   }
   
+  // Check theme files (if present in new tokens)
+  for (const themeName of Object.keys(THEME_MODE_TO_FILE)) {
+    const filePath = THEME_MODE_TO_FILE[themeName];
+    
+    // Only check if we extracted tokens for this theme
+    if (newTokensMap[filePath]) {
+      const newTheme = newTokensMap[filePath];
+      const currentTheme = currentTokensMap[filePath];
+      
+      const newVars = newTheme.color && newTheme.color.theme && newTheme.color.theme[themeName.toLowerCase()] 
+        ? newTheme.color.theme[themeName.toLowerCase()] 
+        : {};
+      const currentVars = currentTheme.color && currentTheme.color.theme && currentTheme.color.theme[themeName.toLowerCase()] 
+        ? currentTheme.color.theme[themeName.toLowerCase()] 
+        : {};
+      
+      const allVarNames = new Set([...Object.keys(newVars), ...Object.keys(currentVars)]);
+      let hasThemeChanges = false;
+      
+      for (const varName of allVarNames) {
+        const newValue = newVars[varName] ? newVars[varName].$value : undefined;
+        const currentValue = currentVars[varName] ? currentVars[varName].$value : undefined;
+        
+        if (newValue !== currentValue) {
+          console.log(`Theme ${themeName} change: ${varName}: ${currentValue} → ${newValue}`);
+          hasThemeChanges = true;
+          break;
+        }
+      }
+      
+      if (hasThemeChanges) {
+        changedFiles.push(filePath);
+      }
+    }
+  }
+  
   if (changedFiles.length === 0) {
     console.log('No changes detected in any token files');
   } else {
@@ -1024,9 +1215,22 @@ figma.ui.onmessage = async (msg) => {
         figma.ui.postMessage({ type: 'progress', message: 'Extracting tokens from Figma...' });
         const { tokens: tokensMap, stats } = await extractAllTokens();
         
+        // Also try to extract themes
+        figma.ui.postMessage({ type: 'progress', message: 'Checking for theme variables...' });
+        const { tokens: themeTokensMap, stats: themeStats } = await extractThemeTokens();
+        
+        // Merge theme tokens into main tokens map
+        Object.assign(tokensMap, themeTokensMap);
+        
+        // Merge stats
+        const combinedStats = {
+          ...stats,
+          themes: themeStats
+        };
+        
         figma.ui.postMessage({
           type: 'extracted',
-          data: stats
+          data: combinedStats
         });
         
         // Validate all tokens before proceeding
@@ -1066,9 +1270,9 @@ figma.ui.onmessage = async (msg) => {
         figma.ui.postMessage({
           type: 'sync-success',
           data: {
-            foundationColors: stats.foundationColors.processed,
-            semanticAttachment: stats.semanticAttachment.processed,
-            totalTokens: stats.total.processed,
+            foundationColors: combinedStats.foundationColors.processed,
+            semanticAttachment: combinedStats.semanticAttachment.processed,
+            totalTokens: combinedStats.total.processed + (combinedStats.themes ? combinedStats.themes.processed : 0),
             changedFiles: changeDetection.changedFiles,
             timestamp: Date.now()
           }
