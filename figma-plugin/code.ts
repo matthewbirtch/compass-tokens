@@ -509,7 +509,7 @@ async function extractThemeTokens() {
   const themeCollections = new Map<string, any>();
   
   for (const variable of colorVariables) {
-    const collection = figma.variables.getVariableCollectionById(variable.variableCollectionId);
+    const collection = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
     if (!collection) continue;
     
     // Check if this collection has theme modes
