@@ -3,56 +3,9 @@
   "color": {
     "theme": {
       "quartz": {
-        "center-channel-bg": {
+        "away-indicator": {
           "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "center-channel-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.900}"
-        },
-        "sidebar-bg": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.50}"
-        },
-        "sidebar-header-bg": {
-          "$type": "color",
-          "$value": "#EBECEF",
-          "$description": "Custom light gray value"
-        },
-        "sidebar-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.1100}"
-        },
-        "sidebar-text-hover-bg": {
-          "$type": "color",
-          "$value": "#E8EAED",
-          "$description": "Custom light hover value"
-        },
-        "sidebar-header-text-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.1100}"
-        },
-        "sidebar-unread-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.1100}"
-        },
-        "sidebar-text-active-border": {
-          "$type": "color",
-          "$value": "{color.foundation.cyan.500}"
-        },
-        "sidebar-text-active-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.1100}"
-        },
-        "sidebar-team-background": {
-          "$type": "color",
-          "$value": "#E5E7EB",
-          "$description": "Custom light team background"
-        },
-        "link-color": {
-          "$type": "color",
-          "$value": "{color.foundation.blue.600}"
+          "$value": "{color.foundation.yellow.500}"
         },
         "button-bg": {
           "$type": "color",
@@ -62,21 +15,33 @@
           "$type": "color",
           "$value": "{color.foundation.neutral.0}"
         },
-        "online-indicator": {
+        "calls-bg": {
           "$type": "color",
-          "$value": "{color.foundation.green.500}"
+          "$value": "#24272E"
         },
-        "away-indicator": {
+        "center-channel-bg": {
           "$type": "color",
-          "$value": "{color.foundation.yellow.500}"
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "center-channel-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.900}"
         },
         "dnd-indicator": {
           "$type": "color",
           "$value": "{color.foundation.red.400}"
         },
+        "error-text": {
+          "$type": "color",
+          "$value": "{color.foundation.red.400}"
+        },
+        "link-color": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.600}"
+        },
         "mention-bg": {
           "$type": "color",
-          "$value": "{color.foundation.blue.500}"
+          "$value": "button-bg"
         },
         "mention-color": {
           "$type": "color",
@@ -90,18 +55,49 @@
           "$type": "color",
           "$value": "{color.foundation.teal.800}"
         },
-        "error-text": {
-          "$type": "color",
-          "$value": "{color.foundation.red.400}"
-        },
         "new-message-separator": {
           "$type": "color",
           "$value": "{color.foundation.teal.600}"
         },
-        "calls-bg": {
+        "online-indicator": {
           "$type": "color",
-          "$value": "#24272E",
-          "$description": "Custom dark calls background"
+          "$value": "{color.foundation.green.500}"
+        },
+        "sidebar-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.50}"
+        },
+        "sidebar-header-bg": {
+          "$type": "color",
+          "$value": "#EBECEF"
+        },
+        "sidebar-header-text-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-team-background": {
+          "$type": "color",
+          "$value": "#E5E7EB"
+        },
+        "sidebar-text": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.1100}"
+        },
+        "sidebar-text-active-border": {
+          "$type": "color",
+          "$value": "{color.foundation.cyan.500}"
+        },
+        "sidebar-text-active-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-text-hover-bg": {
+          "$type": "color",
+          "$value": "#E8EAED"
+        },
+        "sidebar-unread-text": {
+          "$type": "color",
+          "$value": "sidebar-text"
         }
       }
     }

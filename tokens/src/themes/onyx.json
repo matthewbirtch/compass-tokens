@@ -3,85 +3,45 @@
   "color": {
     "theme": {
       "onyx": {
-        "center-channel-bg": {
+        "away-indicator": {
           "$type": "color",
-          "$value": "#191B1F",
-          "$description": "Custom dark background"
-        },
-        "center-channel-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.150}"
-        },
-        "sidebar-bg": {
-          "$type": "color",
-          "$value": "#202228",
-          "$description": "Custom dark sidebar background"
-        },
-        "sidebar-header-bg": {
-          "$type": "color",
-          "$value": "#24272D",
-          "$description": "Custom dark sidebar header"
-        },
-        "sidebar-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-text-hover-bg": {
-          "$type": "color",
-          "$value": "#25262A",
-          "$description": "Custom dark hover background"
-        },
-        "sidebar-header-text-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-unread-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-text-active-border": {
-          "$type": "color",
-          "$value": "#4A7CE8",
-          "$description": "Custom blue active border"
-        },
-        "sidebar-text-active-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-team-background": {
-          "$type": "color",
-          "$value": "#292C33",
-          "$description": "Custom dark team background"
-        },
-        "link-color": {
-          "$type": "color",
-          "$value": "{color.foundation.blue.300}"
+          "$value": "{color.foundation.yellow.500}"
         },
         "button-bg": {
           "$type": "color",
-          "$value": "#4A7CE8",
-          "$description": "Custom blue button background"
+          "$value": "#4A7CE8"
         },
         "button-color": {
           "$type": "color",
           "$value": "{color.foundation.neutral.0}"
         },
-        "online-indicator": {
+        "calls-bg": {
           "$type": "color",
-          "$value": "{color.foundation.green.500}"
+          "$value": "#24262D"
         },
-        "away-indicator": {
+        "center-channel-bg": {
           "$type": "color",
-          "$value": "{color.foundation.yellow.500}"
+          "$value": "#191B1F"
+        },
+        "center-channel-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.150}"
         },
         "dnd-indicator": {
           "$type": "color",
           "$value": "{color.foundation.red.400}"
         },
+        "error-text": {
+          "$type": "color",
+          "$value": "{color.foundation.red.300}"
+        },
+        "link-color": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.300}"
+        },
         "mention-bg": {
           "$type": "color",
-          "$value": "#4A7CE8",
-          "$description": "Matches button-bg"
+          "$value": "#4A7CE8"
         },
         "mention-color": {
           "$type": "color",
@@ -95,18 +55,49 @@
           "$type": "color",
           "$value": "{color.foundation.teal.100}"
         },
-        "error-text": {
-          "$type": "color",
-          "$value": "{color.foundation.red.300}"
-        },
         "new-message-separator": {
           "$type": "color",
           "$value": "{color.foundation.yellow.400}"
         },
-        "calls-bg": {
+        "online-indicator": {
           "$type": "color",
-          "$value": "#24262D",
-          "$description": "Custom dark calls background"
+          "$value": "{color.foundation.green.500}"
+        },
+        "sidebar-bg": {
+          "$type": "color",
+          "$value": "#202228"
+        },
+        "sidebar-header-bg": {
+          "$type": "color",
+          "$value": "#24272D"
+        },
+        "sidebar-header-text-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-team-background": {
+          "$type": "color",
+          "$value": "#292C33"
+        },
+        "sidebar-text": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "sidebar-text-active-border": {
+          "$type": "color",
+          "$value": "#4A7CE8"
+        },
+        "sidebar-text-active-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-text-hover-bg": {
+          "$type": "color",
+          "$value": "#25262A"
+        },
+        "sidebar-unread-text": {
+          "$type": "color",
+          "$value": "sidebar-text"
         }
       }
     }
