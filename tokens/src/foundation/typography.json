@@ -3,156 +3,158 @@
   "typography": {
     "foundation": {
       "fontFamily": {
-        "heading": {
-          "$type": "fontFamily",
-          "$value": ["Metropolis", "sans-serif"],
-          "$description": "Heading font family for headings and display text"
-        },
         "body": {
           "$type": "fontFamily",
-          "$value": ["Open Sans", "sans-serif"],
-          "$description": "Body font family for general UI text"
+          "$value": [
+            "Open Sans",
+            "sans-serif"
+          ]
+        },
+        "heading": {
+          "$type": "fontFamily",
+          "$value": [
+            "Metropolis",
+            "sans-serif"
+          ]
         },
         "mono": {
           "$type": "fontFamily",
-          "$value": ["Menlo", "monospace"],
-          "$description": "Monospace font family for code"
+          "$value": [
+            "Menlo",
+            "monospace"
+          ]
         }
       },
       "fontSize": {
-        "25": {
-          "$type": "dimension",
-          "$value": 10,
-          "$description": "Extra extra small font size (10px)"
-        },
-        "50": {
-          "$type": "dimension",
-          "$value": 11,
-          "$description": "Extra small font size (11px)"
-        },
-        "75": {
-          "$type": "dimension",
-          "$value": 12,
-          "$description": "Small font size (12px)"
-        },
         "100": {
           "$type": "dimension",
-          "$value": 14,
-          "$description": "Base font size (14px)"
-        },
-        "200": {
-          "$type": "dimension",
-          "$value": 16,
-          "$description": "Medium font size (16px)"
-        },
-        "300": {
-          "$type": "dimension",
-          "$value": 18,
-          "$description": "Large font size (18px)"
-        },
-        "400": {
-          "$type": "dimension",
-          "$value": 20,
-          "$description": "Extra large font size (20px)"
-        },
-        "500": {
-          "$type": "dimension",
-          "$value": 22,
-          "$description": "Heading font size (22px)"
-        },
-        "600": {
-          "$type": "dimension",
-          "$value": 25,
-          "$description": "Heading font size (25px)"
-        },
-        "700": {
-          "$type": "dimension",
-          "$value": 28,
-          "$description": "Heading font size (28px)"
-        },
-        "800": {
-          "$type": "dimension",
-          "$value": 32,
-          "$description": "Heading font size (32px)"
-        },
-        "900": {
-          "$type": "dimension",
-          "$value": 36,
-          "$description": "Heading font size (36px)"
+          "$value": 14
         },
         "1000": {
           "$type": "dimension",
-          "$value": 40,
-          "$description": "Heading font size (40px)"
+          "$value": 40
+        },
+        "200": {
+          "$type": "dimension",
+          "$value": 16
+        },
+        "25": {
+          "$type": "dimension",
+          "$value": 10
+        },
+        "300": {
+          "$type": "dimension",
+          "$value": 18
+        },
+        "400": {
+          "$type": "dimension",
+          "$value": 20
+        },
+        "50": {
+          "$type": "dimension",
+          "$value": 11
+        },
+        "500": {
+          "$type": "dimension",
+          "$value": 22
+        },
+        "600": {
+          "$type": "dimension",
+          "$value": 25
+        },
+        "700": {
+          "$type": "dimension",
+          "$value": 28
+        },
+        "75": {
+          "$type": "dimension",
+          "$value": 12
+        },
+        "800": {
+          "$type": "dimension",
+          "$value": 32
+        },
+        "900": {
+          "$type": "dimension",
+          "$value": 36
         }
       },
       "fontWeight": {
+        "bold": {
+          "$type": "fontWeight",
+          "$value": 700
+        },
         "light": {
           "$type": "fontWeight",
-          "$value": 300,
-          "$description": "Light weight"
+          "$value": 300
         },
         "regular": {
           "$type": "fontWeight",
-          "$value": 400,
-          "$description": "Regular weight"
+          "$value": 400
         },
         "semibold": {
           "$type": "fontWeight",
-          "$value": 600,
-          "$description": "Semi-bold weight"
+          "$value": 600
+        }
+      },
+      "letterSpacing": {
+        "normal": {
+          "$type": "dimension",
+          "$value": 0
         },
-        "bold": {
-          "$type": "fontWeight",
-          "$value": 700,
-          "$description": "Bold weight"
+        "tight-1": {
+          "$type": "dimension",
+          "$value": -1
+        },
+        "tight-2": {
+          "$type": "dimension",
+          "$value": -2
+        },
+        "wide-1": {
+          "$type": "dimension",
+          "$value": 1
+        },
+        "wide-2": {
+          "$type": "dimension",
+          "$value": 2
         }
       },
       "lineHeight": {
         "16": {
           "$type": "dimension",
-          "$value": 16,
-          "$description": "Extra tight line height (16px)"
+          "$value": 16
         },
         "20": {
           "$type": "dimension",
-          "$value": 20,
-          "$description": "Tight line height (20px)"
+          "$value": 20
         },
         "24": {
           "$type": "dimension",
-          "$value": 24,
-          "$description": "Normal line height (24px)"
+          "$value": 24
         },
         "28": {
           "$type": "dimension",
-          "$value": 28,
-          "$description": "Relaxed line height (28px)"
+          "$value": 28
         },
         "30": {
           "$type": "dimension",
-          "$value": 30,
-          "$description": "Relaxed line height (30px)"
+          "$value": 30
         },
         "36": {
           "$type": "dimension",
-          "$value": 36,
-          "$description": "Loose line height (36px)"
+          "$value": 36
         },
         "40": {
           "$type": "dimension",
-          "$value": 40,
-          "$description": "Extra loose line height (40px)"
+          "$value": 40
         },
         "44": {
           "$type": "dimension",
-          "$value": 44,
-          "$description": "Extra loose line height (44px)"
+          "$value": 44
         },
         "48": {
           "$type": "dimension",
-          "$value": 48,
-          "$description": "Extra loose line height (48px)"
+          "$value": 48
         }
       }
     }
