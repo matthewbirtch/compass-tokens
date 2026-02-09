@@ -3,85 +3,85 @@
   "color": {
     "theme": {
       "indigo": {
-        "center-channel-bg": {
+        "away-indicator": {
           "$type": "color",
-          "$value": "#111827",
-          "$description": "Custom dark indigo background"
-        },
-        "center-channel-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.150}"
-        },
-        "sidebar-bg": {
-          "$type": "color",
-          "$value": "#151E32",
-          "$description": "Custom dark indigo sidebar"
-        },
-        "sidebar-header-bg": {
-          "$type": "color",
-          "$value": "#182339",
-          "$description": "Custom dark indigo header"
-        },
-        "sidebar-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-text-hover-bg": {
-          "$type": "color",
-          "$value": "#222C3F",
-          "$description": "Custom dark indigo hover"
-        },
-        "sidebar-header-text-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-unread-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-text-active-border": {
-          "$type": "color",
-          "$value": "#4A7CE8",
-          "$description": "Custom blue active border"
-        },
-        "sidebar-text-active-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-team-background": {
-          "$type": "color",
-          "$value": "#1C2740",
-          "$description": "Custom dark indigo team background"
-        },
-        "link-color": {
-          "$type": "color",
-          "$value": "{color.foundation.blue.300}"
+          "$value": "{color.foundation.yellow.500}"
         },
         "button-bg": {
           "$type": "color",
-          "$value": "#4A7CE8",
-          "$description": "Custom blue button background"
+          "$value": "#4A7CE8"
+        },
+        "button-bg-12": {
+          "$type": "color",
+          "$value": "#5D89EA"
+        },
+        "button-bg-4": {
+          "$type": "color",
+          "$value": "#5D89EA"
         },
         "button-color": {
           "$type": "color",
           "$value": "{color.foundation.neutral.0}"
         },
-        "online-indicator": {
+        "button-color-12": {
           "$type": "color",
-          "$value": "{color.foundation.green.500}"
+          "$value": "#FFFFFF"
         },
-        "away-indicator": {
+        "calls-bg": {
           "$type": "color",
-          "$value": "{color.foundation.yellow.500}"
+          "$value": "#222C3F"
+        },
+        "center-channel-bg": {
+          "$type": "color",
+          "$value": "#111827"
+        },
+        "center-channel-bg-12": {
+          "$type": "color",
+          "$value": "#0A111F"
+        },
+        "center-channel-bg-75": {
+          "$type": "color",
+          "$value": "#090A0B"
+        },
+        "center-channel-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.150}"
+        },
+        "center-channel-color-12": {
+          "$type": "color",
+          "$value": "#DDDFE4"
+        },
+        "center-channel-color-4": {
+          "$type": "color",
+          "$value": "#DDDFE4"
+        },
+        "center-channel-color-75": {
+          "$type": "color",
+          "$value": "#DDDFE4"
         },
         "dnd-indicator": {
           "$type": "color",
           "$value": "{color.foundation.red.400}"
         },
+        "error-text": {
+          "$type": "color",
+          "$value": "{color.foundation.red.300}"
+        },
+        "error-text-12": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-4": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "link-color": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.300}"
+        },
         "mention-bg": {
           "$type": "color",
-          "$value": "#4A7CE8",
-          "$description": "Matches button-bg"
+          "$value": "#4A7CE8"
         },
         "mention-color": {
           "$type": "color",
@@ -95,18 +95,57 @@
           "$type": "color",
           "$value": "{color.foundation.teal.100}"
         },
-        "error-text": {
-          "$type": "color",
-          "$value": "{color.foundation.red.300}"
-        },
         "new-message-separator": {
           "$type": "color",
           "$value": "{color.foundation.yellow.400}"
         },
-        "calls-bg": {
+        "online-indicator": {
           "$type": "color",
-          "$value": "#222C3F",
-          "$description": "Custom dark indigo calls background"
+          "$value": "{color.foundation.green.500}"
+        },
+        "sidebar-bg": {
+          "$type": "color",
+          "$value": "#151E32"
+        },
+        "sidebar-header-bg": {
+          "$type": "color",
+          "$value": "#182339"
+        },
+        "sidebar-header-text-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-team-background": {
+          "$type": "color",
+          "$value": "#1C2740"
+        },
+        "sidebar-text": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "sidebar-text-12": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-75": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-active-border": {
+          "$type": "color",
+          "$value": "#4A7CE8"
+        },
+        "sidebar-text-active-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-text-hover-bg": {
+          "$type": "color",
+          "$value": "#222C3F"
+        },
+        "sidebar-unread-text": {
+          "$type": "color",
+          "$value": "sidebar-text"
         }
       }
     }
