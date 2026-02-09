@@ -104,6 +104,13 @@
           <li>✅ Letter spacing: <code>letter-spacing/tight-1</code>, <code>letter-spacing/normal</code></li>
           <li>✅ Output: Font families as arrays, dimensions as numbers</li>
         </ul>
+        
+        <p><strong>Semantic Typography:</strong></p>
+        <ul>
+          <li>✅ Extracted from Figma Text Styles</li>
+          <li>✅ Pattern: <code>heading/1000</code>, <code>body/300-semibold</code></li>
+          <li>✅ Output: Composite tokens referencing foundation values</li>
+        </ul>
       </div>
     </details>
   </div>
@@ -250,6 +257,7 @@
           const radiusCount = msg.data.foundationRadius ? msg.data.foundationRadius.processed : 0;
           const spacingCount = msg.data.foundationSpacing ? msg.data.foundationSpacing.processed : 0;
           const typographyCount = msg.data.foundationTypography ? msg.data.foundationTypography.processed : 0;
+          const semanticTypographyCount = msg.data.semanticTypography ? msg.data.semanticTypography.processed : 0;
           const themeCount = msg.data.themes && msg.data.themes.processed ? msg.data.themes.processed : 0;
           const themeModesCount = msg.data.themes && msg.data.themes.modes ? msg.data.themes.modes : 0;
           
@@ -259,6 +267,7 @@
           if (radiusCount > 0) detailParts.push(`Radius: ${radiusCount}`);
           if (spacingCount > 0) detailParts.push(`Spacing: ${spacingCount}`);
           if (typographyCount > 0) detailParts.push(`Typography: ${typographyCount}`);
+          if (semanticTypographyCount > 0) detailParts.push(`Text Styles: ${semanticTypographyCount}`);
           if (themeCount > 0) detailParts.push(`Themes: ${themeCount} tokens across ${themeModesCount} modes`);
           
           const details = detailParts.join(' | ') + ` | Total: ${totalTokens}`;

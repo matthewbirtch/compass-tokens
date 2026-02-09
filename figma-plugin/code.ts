@@ -13,6 +13,7 @@ const TOKEN_FILES = {
   FOUNDATION_RADIUS: 'tokens/src/foundation/radius.json',
   FOUNDATION_SPACING: 'tokens/src/foundation/spacing.json',
   TYPOGRAPHY_FOUNDATION: 'tokens/src/foundation/typography.json',
+  TYPOGRAPHY_SEMANTIC: 'tokens/src/semantic/typography.json',
   THEME_DENIM: 'tokens/src/themes/denim.json',
   THEME_SAPPHIRE: 'tokens/src/themes/sapphire.json',
   THEME_QUARTZ: 'tokens/src/themes/quartz.json',
@@ -253,6 +254,209 @@ function parseTypographyVariableName(name: string): { property: string; value: s
   }
   
   return null;
+}
+
+/**
+ * Parse semantic typography text style name
+ * Examples: "heading/1000", "heading/1000-regular", "body/300-semibold"
+ */
+function parseSemanticTypographyName(name: string): { category: string; size: string; variant?: string } | null {
+  // Match patterns like "Heading 1000" or "Body 300 - Semibold" or "Code 100"
+  const match = name.match(/^(Heading|Body|Code)\s+(25|50|75|100|200|300|400|500|600|700|800|900|1000)(?:\s+-\s+(.+))?$/);
+  if (!match) return null;
+  
+  const category = match[1].toLowerCase();
+  const size = match[2];
+  const variantRaw = match[3];
+  
+  let variant: string | undefined;
+  if (variantRaw) {
+    // Normalize variant names
+    if (variantRaw === 'All Caps') {
+      variant = 'allCaps';
+    } else {
+      // Convert "Semibold", "Regular", "Light", "Bold" to lowercase
+      variant = variantRaw.toLowerCase();
+    }
+  }
+  
+  return {
+    category,
+    size,
+    variant
+  };
+}
+
+/**
+ * Map Figma font weight number to foundation weight token name
+ */
+function mapFontWeightToToken(weight: number): string {
+  if (weight <= 300) return 'light';
+  if (weight <= 400) return 'regular';
+  if (weight <= 600) return 'semibold';
+  return 'bold';
+}
+
+/**
+ * Map Figma letter spacing to foundation token name
+ */
+function mapLetterSpacingToToken(spacing: number): string {
+  if (spacing <= -2) return 'tight-2';
+  if (spacing <= -1) return 'tight-1';
+  if (spacing <= 0) return 'normal';
+  if (spacing <= 1) return 'wide-1';
+  return 'wide-2';
+}
+
+/**
+ * Find the closest line height scale value for a given pixel value
+ */
+function findClosestLineHeightScale(pixelValue: number, fontSize: number): string {
+  // Common line heights mapped to their scale values
+  const lineHeightMap: { [key: string]: number } = {
+    '25': 16, '50': 16, '75': 16,
+    '100': 20,
+    '200': 24, '300': 24,
+    '400': 28, '500': 28,
+    '600': 30,
+    '700': 36,
+    '800': 40,
+    '900': 44,
+    '1000': 48
+  };
+  
+  // Find the scale value that matches this pixel value
+  for (const [scale, pixels] of Object.entries(lineHeightMap)) {
+    if (pixels === pixelValue) {
+      return scale;
+    }
+  }
+  
+  // If no exact match, return the closest scale for this font size
+  // This is a fallback - ideally we'd have exact matches
+  return String(Math.round(fontSize * 10 / 2) * 2);
+}
+
+/**
+ * Extract semantic typography tokens from Figma Text Styles
+ */
+async function extractSemanticTypographyTokens() {
+  const textStyles = await figma.getLocalTextStylesAsync();
+  console.log(`Found ${textStyles.length} text styles`);
+  if (textStyles.length > 0) {
+    console.log('Text style names:', textStyles.map(s => s.name).join(', '));
+  }
+  
+  const tokens: any = {
+    $schema: "https://tr.designtokens.org/format/",
+    typography: {
+      semantic: {
+        heading: {},
+        body: {},
+        code: {}
+      }
+    }
+  };
+  
+  const stats = {
+    processed: 0,
+    skipped: 0
+  };
+  
+  for (const style of textStyles) {
+    const parsed = parseSemanticTypographyName(style.name);
+    
+    if (!parsed) {
+      console.log(`❌ Skipped: "${style.name}" (doesn't match pattern)`);
+      stats.skipped++;
+      continue;
+    }
+    console.log(`✅ Matched: "${style.name}" -> ${parsed.category}/${parsed.size}${parsed.variant ? '-' + parsed.variant : ''}`);
+    
+    const { category, size, variant } = parsed;
+    console.log(`  ✓ Parsed: category=${category}, size=${size}, variant=${variant || 'default'}`);
+    
+    // Get actual style properties from Figma
+    // Font weight is determined by the variant in the name
+    let weightToken = 'semibold'; // default for headings
+    if (category === 'body') {
+      weightToken = variant === 'semibold' ? 'semibold' : 'regular';
+    } else if (category === 'heading') {
+      if (variant === 'regular') weightToken = 'regular';
+      else if (variant === 'light') weightToken = 'light';
+      else weightToken = 'semibold'; // default
+    }
+    
+    // Get letter spacing from the style
+    let letterSpacingValue = 0;
+    if (style.letterSpacing && typeof style.letterSpacing === 'object') {
+      if ('unit' in style.letterSpacing && style.letterSpacing.unit === 'PIXELS') {
+        letterSpacingValue = style.letterSpacing.value;
+      }
+    }
+    
+    console.log(`  Style properties: weightToken=${weightToken}, letterSpacing=${letterSpacingValue}`);
+    
+    // Map to foundation token references
+    const letterSpacingToken = mapLetterSpacingToToken(letterSpacingValue);
+    
+    // Build token key
+    const tokenKey = variant ? `${size}-${variant}` : size;
+    
+    // Build composite token
+    const compositeToken: any = {
+      $type: "typography",
+      $value: {
+        fontFamily: `{typography.foundation.fontFamily.${category}}`,
+        fontSize: `{typography.foundation.fontSize.${size}}`,
+        fontWeight: `{typography.foundation.fontWeight.${weightToken}}`,
+        lineHeight: `{typography.foundation.lineHeight.${size}}`,
+        letterSpacing: `{typography.foundation.letterSpacing.${letterSpacingToken}}`
+      }
+    };
+    
+    tokens.typography.semantic[category][tokenKey] = compositeToken;
+    console.log(`  ✓ Added ${category}.${tokenKey}`);
+    stats.processed++;
+  }
+  
+  // Sort heading, body, and code tokens by size (ascending)
+  ['heading', 'body', 'code'].forEach(category => {
+    if (Object.keys(tokens.typography.semantic[category]).length > 0) {
+      const sorted: any = {};
+      const keys = Object.keys(tokens.typography.semantic[category]).sort((a, b) => {
+        // Extract numeric size from key (e.g., "1000" or "1000-regular")
+        const sizeA = parseInt(a.split('-')[0]);
+        const sizeB = parseInt(b.split('-')[0]);
+        
+        // Primary sort: by size (ascending - smallest first)
+        if (sizeA !== sizeB) {
+          return sizeA - sizeB;
+        }
+        
+        // Secondary sort: by variant (alphabetical)
+        // Default (no variant) comes first, then alphabetical
+        const variantA = a.includes('-') ? a.substring(a.indexOf('-') + 1) : '';
+        const variantB = b.includes('-') ? b.substring(b.indexOf('-') + 1) : '';
+        
+        if (variantA === '' && variantB !== '') return -1;
+        if (variantA !== '' && variantB === '') return 1;
+        return variantA.localeCompare(variantB);
+      });
+      keys.forEach(key => {
+        sorted[key] = tokens.typography.semantic[category][key];
+      });
+      tokens.typography.semantic[category] = sorted;
+    }
+  });
+  
+  console.log(`Semantic typography token structure:`, {
+    headingCount: Object.keys(tokens.typography.semantic.heading).length,
+    bodyCount: Object.keys(tokens.typography.semantic.body).length,
+    codeCount: Object.keys(tokens.typography.semantic.code).length
+  });
+  
+  return { tokens, stats };
 }
 
 /**
@@ -521,6 +725,7 @@ async function extractAllTokens() {
     foundationRadius: { processed: 0, skipped: 0 },
     foundationSpacing: { processed: 0, skipped: 0 },
     foundationTypography: { processed: 0, skipped: 0 },
+    semanticTypography: { processed: 0, skipped: 0 },
     total: { processed: 0, skipped: 0 }
   };
 
@@ -790,13 +995,23 @@ async function extractAllTokens() {
   const typographyTokens = buildFoundationTypographyTokens(typographyVariables);
   console.log(`Built typography tokens with ${typographyVariables.length} variables`);
 
+  // Extract semantic typography from text styles
+  console.log('Extracting semantic typography from text styles...');
+  const { tokens: semanticTypographyTokens, stats: semanticTypoStats } = await extractSemanticTypographyTokens();
+  console.log(`Semantic typography extraction complete: processed=${semanticTypoStats.processed}, skipped=${semanticTypoStats.skipped}`);
+  stats.semanticTypography = semanticTypoStats;
+  stats.total.processed += semanticTypoStats.processed;
+  stats.total.skipped += semanticTypoStats.skipped;
+  console.log(`Total tokens now: ${stats.total.processed}`);
+
   return {
     tokens: {
       [TOKEN_FILES.FOUNDATION_COLOR]: foundationColorTokens,
       [TOKEN_FILES.SEMANTIC_ATTACHMENT]: semanticAttachmentTokens,
       [TOKEN_FILES.FOUNDATION_RADIUS]: foundationRadiusTokens,
       [TOKEN_FILES.FOUNDATION_SPACING]: foundationSpacingTokens,
-      [TOKEN_FILES.TYPOGRAPHY_FOUNDATION]: typographyTokens
+      [TOKEN_FILES.TYPOGRAPHY_FOUNDATION]: typographyTokens,
+      [TOKEN_FILES.TYPOGRAPHY_SEMANTIC]: semanticTypographyTokens
     },
     stats: {
       ...stats,
@@ -1152,6 +1367,55 @@ function validateSpacingTokens(tokens: any): { valid: boolean; errors: string[];
 }
 
 /**
+ * Validate semantic typography tokens
+ */
+function validateSemanticTypographyTokens(tokens: any): { valid: boolean; errors: string[]; warnings: string[] } {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Check structure
+  if (!tokens.$schema) {
+    warnings.push('Semantic typography: Missing $schema field');
+  }
+
+  if (!tokens.typography || !tokens.typography.semantic) {
+    errors.push('Semantic typography: Invalid token structure');
+    return { valid: false, errors, warnings };
+  }
+
+  const semantic = tokens.typography.semantic;
+  
+  // Validate heading, body, and code categories
+  ['heading', 'body', 'code'].forEach(category => {
+    if (semantic[category]) {
+      Object.entries(semantic[category]).forEach(([name, token]: [string, any]) => {
+        if (!token.$type || token.$type !== 'typography') {
+          errors.push(`Semantic typography ${category}/${name}: Invalid or missing $type (expected "typography")`);
+        }
+
+        if (!token.$value) {
+          errors.push(`Semantic typography ${category}/${name}: Missing $value`);
+        } else {
+          // Validate composite structure
+          const requiredProps = ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing'];
+          requiredProps.forEach(prop => {
+            if (!token.$value[prop]) {
+              errors.push(`Semantic typography ${category}/${name}: Missing ${prop} in $value`);
+            }
+          });
+        }
+      });
+    }
+  });
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+/**
  * Validate foundation typography tokens
  */
 function validateTypographyTokens(tokens: any): { valid: boolean; errors: string[]; warnings: string[] } {
@@ -1305,6 +1569,13 @@ function validateAllTokens(tokensMap: any): { valid: boolean; errors: string[]; 
     allWarnings.push(...typographyValidation.warnings);
   }
 
+  // Validate semantic typography (if present)
+  if (tokensMap[TOKEN_FILES.TYPOGRAPHY_SEMANTIC]) {
+    const semanticTypoValidation = validateSemanticTypographyTokens(tokensMap[TOKEN_FILES.TYPOGRAPHY_SEMANTIC]);
+    allErrors.push(...semanticTypoValidation.errors);
+    allWarnings.push(...semanticTypoValidation.warnings);
+  }
+
   // Validate theme files (if present) - basic validation for now
   Object.keys(THEME_MODE_TO_FILE).forEach(themeName => {
     const filePath = THEME_MODE_TO_FILE[themeName];
@@ -1400,6 +1671,16 @@ async function fetchAllCurrentTokens(githubToken: string): Promise<any> {
   } catch (e) {
     console.log('Foundation typography not found in repo (may be new file)');
     tokens[TOKEN_FILES.TYPOGRAPHY_FOUNDATION] = { typography: { foundation: { fontFamily: {}, fontSize: {}, fontWeight: {}, lineHeight: {}, letterSpacing: {} } } };
+  }
+  
+  try {
+    tokens[TOKEN_FILES.TYPOGRAPHY_SEMANTIC] = await fetchCurrentTokensFromFile(
+      githubToken, 
+      TOKEN_FILES.TYPOGRAPHY_SEMANTIC
+    );
+  } catch (e) {
+    console.log('Semantic typography not found in repo (may be new file)');
+    tokens[TOKEN_FILES.TYPOGRAPHY_SEMANTIC] = { typography: { semantic: { heading: {}, body: {}, code: {} } } };
   }
   
   // Fetch theme files
@@ -1508,6 +1789,42 @@ function hasFoundationRadiusChanges(newTokens: any, currentTokens: any): boolean
     if (newValue !== currentValue) {
       console.log(`Radius change: ${size}: ${currentValue} → ${newValue}`);
       return true;
+    }
+  }
+  
+  return false;
+}
+
+/**
+ * Compare semantic typography tokens for differences
+ */
+function hasSemanticTypographyChanges(newTokens: any, currentTokens: any): boolean {
+  const newSemantic = (newTokens.typography && newTokens.typography.semantic) ? newTokens.typography.semantic : {};
+  const currentSemantic = (currentTokens.typography && currentTokens.typography.semantic) ? currentTokens.typography.semantic : {};
+  
+  // Check both heading and body categories
+  const categories = ['heading', 'body'];
+  
+  for (const category of categories) {
+    const newCat = newSemantic[category] || {};
+    const currentCat = currentSemantic[category] || {};
+    
+    // Get all style names from both
+    const allNames = new Set([
+      ...Object.keys(newCat),
+      ...Object.keys(currentCat)
+    ]);
+    
+    // Check each style
+    for (const name of allNames) {
+      const newStyle = newCat[name];
+      const currentStyle = currentCat[name];
+      
+      // Compare the composite values
+      if (JSON.stringify(newStyle) !== JSON.stringify(currentStyle)) {
+        console.log(`Semantic typography change: ${category}.${name}`);
+        return true;
+      }
     }
   }
   
@@ -1639,6 +1956,21 @@ function detectChanges(newTokensMap: any, currentTokensMap: any): { hasChanges: 
     
     if (hasTypoTokens && hasTypographyChanges(newTypo, currentTypo)) {
       changedFiles.push(TOKEN_FILES.TYPOGRAPHY_FOUNDATION);
+    }
+  }
+  
+  // Check semantic typography (if present in new tokens)
+  if (newTokensMap[TOKEN_FILES.TYPOGRAPHY_SEMANTIC]) {
+    const newSemanticTypo = newTokensMap[TOKEN_FILES.TYPOGRAPHY_SEMANTIC];
+    const currentSemanticTypo = currentTokensMap[TOKEN_FILES.TYPOGRAPHY_SEMANTIC];
+    
+    // Check if there are any semantic typography tokens extracted
+    const hasSemanticTypoTokens = newSemanticTypo.typography && newSemanticTypo.typography.semantic &&
+      (Object.keys(newSemanticTypo.typography.semantic.heading || {}).length > 0 ||
+       Object.keys(newSemanticTypo.typography.semantic.body || {}).length > 0);
+    
+    if (hasSemanticTypoTokens && hasSemanticTypographyChanges(newSemanticTypo, currentSemanticTypo)) {
+      changedFiles.push(TOKEN_FILES.TYPOGRAPHY_SEMANTIC);
     }
   }
   
