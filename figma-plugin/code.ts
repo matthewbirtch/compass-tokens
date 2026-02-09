@@ -10,13 +10,15 @@ const GITHUB_REPO = 'matthewbirtch/compass-tokens';
 const TOKEN_FILES = {
   FOUNDATION_COLOR: 'tokens/src/foundation/color.json',
   SEMANTIC_ATTACHMENT: 'tokens/src/semantic/attachment.json',
-  FOUNDATION_RADIUS: 'tokens/src/foundation/radius.json'
+  FOUNDATION_RADIUS: 'tokens/src/foundation/radius.json',
+  FOUNDATION_SPACING: 'tokens/src/foundation/spacing.json'
 };
 
 // Token patterns
 const FOUNDATION_COLOR_PATTERN = /^(blue|indigo|neutral|cyan|purple|teal|yellow|orange|green|red)\/\d+$/;
 const SEMANTIC_ATTACHMENT_PATTERN = /^attachment\/(blue|green|orange|red|grey)$/;
 const FOUNDATION_RADIUS_PATTERN = /^radius-(xs|s|m|l|xl|full)$/;
+const FOUNDATION_SPACING_PATTERN = /^spacing-(xxxxs|xs|m|l|xl|xxl|xxxl|xxxxl)$/;
 
 // Token category definitions
 interface TokenCategory {
@@ -29,7 +31,8 @@ interface TokenCategory {
 const TOKEN_CATEGORIES: TokenCategory[] = [
   { type: 'foundation-color', path: TOKEN_FILES.FOUNDATION_COLOR, pattern: FOUNDATION_COLOR_PATTERN, variableType: 'COLOR' },
   { type: 'semantic-attachment', path: TOKEN_FILES.SEMANTIC_ATTACHMENT, pattern: SEMANTIC_ATTACHMENT_PATTERN, variableType: 'COLOR' },
-  { type: 'foundation-radius', path: TOKEN_FILES.FOUNDATION_RADIUS, pattern: FOUNDATION_RADIUS_PATTERN, variableType: 'FLOAT' }
+  { type: 'foundation-radius', path: TOKEN_FILES.FOUNDATION_RADIUS, pattern: FOUNDATION_RADIUS_PATTERN, variableType: 'FLOAT' },
+  { type: 'foundation-spacing', path: TOKEN_FILES.FOUNDATION_SPACING, pattern: FOUNDATION_SPACING_PATTERN, variableType: 'FLOAT' }
 ];
 
 // File configuration interface
@@ -132,6 +135,18 @@ function parseFoundationRadiusName(name: string): { size: string } | null {
 }
 
 /**
+ * Parse foundation spacing variable name
+ */
+function parseFoundationSpacingName(name: string): { size: string } | null {
+  const match = name.match(/^spacing-([a-z]+)$/i);
+  if (!match) return null;
+  
+  return {
+    size: match[1].toLowerCase()
+  };
+}
+
+/**
  * Parse semantic attachment variable name
  */
 function parseSemanticAttachmentName(name: string): { color: string } | null {
@@ -211,10 +226,18 @@ async function extractAllTokens() {
     }
   };
 
+  const foundationSpacingTokens: any = {
+    $schema: "https://tr.designtokens.org/format/",
+    spacing: {
+      foundation: {}
+    }
+  };
+
   const stats = {
     foundationColors: { processed: 0, skipped: 0 },
     semanticAttachment: { processed: 0, skipped: 0 },
     foundationRadius: { processed: 0, skipped: 0 },
+    foundationSpacing: { processed: 0, skipped: 0 },
     total: { processed: 0, skipped: 0 }
   };
 
@@ -381,32 +404,79 @@ async function extractAllTokens() {
         stats.foundationRadius.skipped++;
         stats.total.skipped++;
       }
+    } else if (category.type === 'foundation-spacing') {
+      const parsed = parseFoundationSpacingName(variable.name);
+      if (!parsed) {
+        console.log(`  ❌ Failed to parse spacing name`);
+        stats.foundationSpacing.skipped++;
+        stats.total.skipped++;
+        continue;
+      }
+
+      const { size } = parsed;
+      console.log(`  Parsed size: ${size}`);
+      
+      // Get the first mode's value
+      const modeId = Object.keys(variable.valuesByMode)[0];
+      const value = variable.valuesByMode[modeId];
+      
+      if (typeof value === 'number') {
+        console.log(`  ✓ Numeric value: ${value}`);
+        
+        // Add token
+        foundationSpacingTokens.spacing.foundation[size] = {
+          $type: "dimension",
+          $value: value
+        };
+        
+        stats.foundationSpacing.processed++;
+        stats.total.processed++;
+      } else {
+        console.log(`  ❌ Unknown value type: ${typeof value}`);
+        stats.foundationSpacing.skipped++;
+        stats.total.skipped++;
+      }
     }
   }
 
-  // Sort radius tokens alphabetically and add full token
-  const sortedRadius: any = {};
-  const radiusSizes = ['xs', 's', 'm', 'l', 'xl', 'full'];
-  radiusSizes.forEach(size => {
-    if (foundationRadiusTokens.radius.foundation[size]) {
-      sortedRadius[size] = foundationRadiusTokens.radius.foundation[size];
+  // Sort radius tokens alphabetically and add full token (only if we have radius tokens)
+  if (Object.keys(foundationRadiusTokens.radius.foundation).length > 0) {
+    const sortedRadius: any = {};
+    const radiusSizes = ['xs', 's', 'm', 'l', 'xl', 'full'];
+    radiusSizes.forEach(size => {
+      if (foundationRadiusTokens.radius.foundation[size]) {
+        sortedRadius[size] = foundationRadiusTokens.radius.foundation[size];
+      }
+    });
+    // Add full token if not present (Figma limitation workaround)
+    if (!sortedRadius['full']) {
+      sortedRadius['full'] = {
+        $type: "dimension",
+        $value: "50%",
+        $description: "Full radius - circular elements, pills, fully rounded buttons"
+      };
     }
-  });
-  // Add full token if not present (Figma limitation workaround)
-  if (!sortedRadius['full']) {
-    sortedRadius['full'] = {
-      $type: "dimension",
-      $value: "50%",
-      $description: "Full radius - circular elements, pills, fully rounded buttons"
-    };
+    foundationRadiusTokens.radius.foundation = sortedRadius;
   }
-  foundationRadiusTokens.radius.foundation = sortedRadius;
+
+  // Sort spacing tokens alphabetically (only if we have spacing tokens)
+  if (Object.keys(foundationSpacingTokens.spacing.foundation).length > 0) {
+    const sortedSpacing: any = {};
+    const spacingSizes = ['xxxxs', 'xs', 'm', 'l', 'xl', 'xxl', 'xxxl', 'xxxxl'];
+    spacingSizes.forEach(size => {
+      if (foundationSpacingTokens.spacing.foundation[size]) {
+        sortedSpacing[size] = foundationSpacingTokens.spacing.foundation[size];
+      }
+    });
+    foundationSpacingTokens.spacing.foundation = sortedSpacing;
+  }
 
   return {
     tokens: {
       [TOKEN_FILES.FOUNDATION_COLOR]: foundationColorTokens,
       [TOKEN_FILES.SEMANTIC_ATTACHMENT]: semanticAttachmentTokens,
-      [TOKEN_FILES.FOUNDATION_RADIUS]: foundationRadiusTokens
+      [TOKEN_FILES.FOUNDATION_RADIUS]: foundationRadiusTokens,
+      [TOKEN_FILES.FOUNDATION_SPACING]: foundationSpacingTokens
     },
     stats: {
       ...stats,
@@ -518,62 +588,72 @@ function validateSemanticTokens(tokens: any): { valid: boolean; errors: string[]
 }
 
 /**
- * Validate foundation radius tokens
+ * Validate foundation dimension tokens (radius, spacing, etc.)
  */
-function validateRadiusTokens(tokens: any): { valid: boolean; errors: string[]; warnings: string[] } {
+function validateDimensionTokens(tokens: any, type: string, expectedSizes: string[]): { valid: boolean; errors: string[]; warnings: string[] } {
   const errors: string[] = [];
   const warnings: string[] = [];
 
   // Check structure
   if (!tokens.$schema) {
-    warnings.push('Radius: Missing $schema field');
+    warnings.push(`${type}: Missing $schema field`);
   }
 
-  if (!tokens.radius || !tokens.radius.foundation) {
-    errors.push('Radius: Invalid token structure');
+  if (!tokens[type.toLowerCase()] || !tokens[type.toLowerCase()].foundation) {
+    errors.push(`${type}: Invalid token structure`);
     return { valid: false, errors, warnings };
   }
 
-  const foundation = tokens.radius.foundation;
-  const expectedSizes = ['xs', 's', 'm', 'l', 'xl', 'full'];
+  const foundation = tokens[type.toLowerCase()].foundation;
   
-  // Validate each radius size
+  // Validate each size
   Object.entries(foundation).forEach(([size, token]: [string, any]) => {
     // Check required fields
     if (!token.$type || token.$type !== 'dimension') {
-      errors.push(`Radius ${size}: Invalid or missing $type (expected "dimension")`);
+      errors.push(`${type} ${size}: Invalid or missing $type (expected "dimension")`);
     }
 
     if (token.$value === undefined || token.$value === null) {
-      errors.push(`Radius ${size}: Missing $value`);
+      errors.push(`${type} ${size}: Missing $value`);
     } else {
-      // Validate value is number or "50%"
+      // Validate value is number or percentage string
       const isNumber = typeof token.$value === 'number';
-      const isPercentage = token.$value === '50%';
+      const isPercentage = typeof token.$value === 'string' && token.$value.endsWith('%');
       
       if (!isNumber && !isPercentage) {
-        errors.push(`Radius ${size}: Value must be a number or "50%" for full radius`);
-      }
-      
-      // Special validation for "full"
-      if (size === 'full' && token.$value !== '50%') {
-        warnings.push(`Radius full: Expected "50%" but got ${token.$value}`);
+        errors.push(`${type} ${size}: Value must be a number or percentage string`);
       }
     }
   });
 
   // Check for missing expected sizes
-  expectedSizes.forEach(size => {
-    if (!foundation[size]) {
-      warnings.push(`Radius: Missing expected size "${size}"`);
-    }
-  });
+  if (expectedSizes) {
+    expectedSizes.forEach(size => {
+      if (!foundation[size]) {
+        warnings.push(`${type}: Missing expected size "${size}"`);
+      }
+    });
+  }
 
   return {
     valid: errors.length === 0,
     errors,
     warnings
   };
+}
+
+/**
+ * Validate foundation radius tokens
+ */
+function validateRadiusTokens(tokens: any): { valid: boolean; errors: string[]; warnings: string[] } {
+  return validateDimensionTokens(tokens, 'Radius', ['xs', 's', 'm', 'l', 'xl', 'full']);
+}
+
+/**
+ * Validate foundation spacing tokens
+ */
+function validateSpacingTokens(tokens: any): { valid: boolean; errors: string[]; warnings: string[] } {
+  return validateDimensionTokens(tokens, 'Spacing', ['xxxxs', 'xs', 'm', 'l', 'xl', 'xxl', 'xxxl', 'xxxxl']);
 }
 
 /**
@@ -602,6 +682,13 @@ function validateAllTokens(tokensMap: any): { valid: boolean; errors: string[]; 
     const radiusValidation = validateRadiusTokens(tokensMap[TOKEN_FILES.FOUNDATION_RADIUS]);
     allErrors.push(...radiusValidation.errors);
     allWarnings.push(...radiusValidation.warnings);
+  }
+
+  // Validate spacing (if present)
+  if (tokensMap[TOKEN_FILES.FOUNDATION_SPACING]) {
+    const spacingValidation = validateSpacingTokens(tokensMap[TOKEN_FILES.FOUNDATION_SPACING]);
+    allErrors.push(...spacingValidation.errors);
+    allWarnings.push(...spacingValidation.warnings);
   }
 
   return {
@@ -667,6 +754,16 @@ async function fetchAllCurrentTokens(githubToken: string): Promise<any> {
   } catch (e) {
     console.log('Foundation radius not found in repo (may be new file)');
     tokens[TOKEN_FILES.FOUNDATION_RADIUS] = { radius: { foundation: {} } };
+  }
+  
+  try {
+    tokens[TOKEN_FILES.FOUNDATION_SPACING] = await fetchCurrentTokensFromFile(
+      githubToken, 
+      TOKEN_FILES.FOUNDATION_SPACING
+    );
+  } catch (e) {
+    console.log('Foundation spacing not found in repo (may be new file)');
+    tokens[TOKEN_FILES.FOUNDATION_SPACING] = { spacing: { foundation: {} } };
   }
   
   return tokens;
@@ -807,6 +904,35 @@ function detectChanges(newTokensMap: any, currentTokensMap: any): { hasChanges: 
       currentTokensMap[TOKEN_FILES.FOUNDATION_RADIUS]
     )) {
       changedFiles.push(TOKEN_FILES.FOUNDATION_RADIUS);
+    }
+  }
+  
+  // Check spacing (if present in new tokens) - reuse radius change detection
+  if (newTokensMap[TOKEN_FILES.FOUNDATION_SPACING] && 
+      Object.keys(newTokensMap[TOKEN_FILES.FOUNDATION_SPACING].spacing.foundation).length > 0) {
+    const newSpacing = newTokensMap[TOKEN_FILES.FOUNDATION_SPACING];
+    const currentSpacing = currentTokensMap[TOKEN_FILES.FOUNDATION_SPACING];
+    
+    // Check for changes (similar to radius)
+    const newSizes = newSpacing.spacing ? newSpacing.spacing.foundation : {};
+    const currentSizes = currentSpacing.spacing ? currentSpacing.spacing.foundation : {};
+    
+    const allSizes = new Set([...Object.keys(newSizes), ...Object.keys(currentSizes)]);
+    let hasSpacingChanges = false;
+    
+    for (const size of allSizes) {
+      const newValue = newSizes[size] ? newSizes[size].$value : undefined;
+      const currentValue = currentSizes[size] ? currentSizes[size].$value : undefined;
+      
+      if (newValue !== currentValue) {
+        console.log(`Spacing change: ${size}: ${currentValue} → ${newValue}`);
+        hasSpacingChanges = true;
+        break;
+      }
+    }
+    
+    if (hasSpacingChanges) {
+      changedFiles.push(TOKEN_FILES.FOUNDATION_SPACING);
     }
   }
   
