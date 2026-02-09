@@ -3,77 +3,173 @@
   "color": {
     "theme": {
       "sapphire": {
-        "center-channel-bg": {
+        "away-indicator": {
           "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "center-channel-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.900}"
-        },
-        "sidebar-bg": {
-          "$type": "color",
-          "$value": "#1543A3",
-          "$description": "Custom sapphire blue value"
-        },
-        "sidebar-header-bg": {
-          "$type": "color",
-          "$value": "#123B91",
-          "$description": "Custom darker sapphire value"
-        },
-        "sidebar-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-text-hover-bg": {
-          "$type": "color",
-          "$value": "#2A58BA",
-          "$description": "Custom sapphire hover value"
-        },
-        "sidebar-header-text-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-unread-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-text-active-border": {
-          "$type": "color",
-          "$value": "{color.foundation.cyan.300}"
-        },
-        "sidebar-text-active-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-team-background": {
-          "$type": "color",
-          "$value": "#123582",
-          "$description": "Custom sapphire team background"
-        },
-        "link-color": {
-          "$type": "color",
-          "$value": "{color.foundation.blue.600}"
+          "$value": "{color.foundation.yellow.500}"
         },
         "button-bg": {
           "$type": "color",
           "$value": "{color.foundation.blue.500}"
         },
+        "button-bg-12": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
+        "button-bg-16": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
+        "button-bg-4": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
+        "button-bg-8": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
         "button-color": {
           "$type": "color",
           "$value": "{color.foundation.neutral.0}"
         },
-        "online-indicator": {
+        "button-color-12": {
           "$type": "color",
-          "$value": "{color.foundation.green.500}"
+          "$value": "#FFFFFF"
         },
-        "away-indicator": {
+        "button-color-16": {
           "$type": "color",
-          "$value": "{color.foundation.yellow.500}"
+          "$value": "#FFFFFF"
+        },
+        "button-color-24": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "button-color-8": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "calls-bg": {
+          "$type": "color",
+          "$value": "#091D48"
+        },
+        "center-channel-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "center-channel-bg-12": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-16": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-24": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-32": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-64": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-75": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-8": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-80": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.900}"
+        },
+        "center-channel-color-12": {
+          "$type": "color",
+          "$value": "#3F4450"
+        },
+        "center-channel-color-16": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-24": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-32": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-4": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-40": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-48": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-56": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-64": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-75": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-8": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-80": {
+          "$type": "color",
+          "$value": "#3F4350"
         },
         "dnd-indicator": {
           "$type": "color",
           "$value": "{color.foundation.red.400}"
+        },
+        "error-text": {
+          "$type": "color",
+          "$value": "{color.foundation.red.300}"
+        },
+        "error-text-12": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-16": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-24": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-4": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-8": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "link-color": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.600}"
         },
         "mention-bg": {
           "$type": "color",
@@ -81,29 +177,99 @@
         },
         "mention-color": {
           "$type": "color",
-          "$value": "#1543A3",
-          "$description": "Matches sidebar-bg"
+          "$value": "sidebar-bg"
         },
         "mention-highlight-bg": {
           "$type": "color",
           "$value": "{color.foundation.teal.200}"
         },
+        "mention-highlight-bg-32": {
+          "$type": "color",
+          "$value": "#D1D4DB"
+        },
         "mention-highlight-link": {
           "$type": "color",
           "$value": "{color.foundation.teal.800}"
-        },
-        "error-text": {
-          "$type": "color",
-          "$value": "{color.foundation.red.300}"
         },
         "new-message-separator": {
           "$type": "color",
           "$value": "{color.foundation.yellow.400}"
         },
-        "calls-bg": {
+        "online-indicator": {
           "$type": "color",
-          "$value": "#091D48",
-          "$description": "Custom dark sapphire value"
+          "$value": "{color.foundation.green.500}"
+        },
+        "sidebar-bg": {
+          "$type": "color",
+          "$value": "#1543A3"
+        },
+        "sidebar-header-bg": {
+          "$type": "color",
+          "$value": "#123B91"
+        },
+        "sidebar-header-text-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-team-background": {
+          "$type": "color",
+          "$value": "#123582"
+        },
+        "sidebar-text": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "sidebar-text-12": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-16": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-24": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-32": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-56": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-64": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-75": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-8": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-80": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-active-border": {
+          "$type": "color",
+          "$value": "{color.foundation.cyan.300}"
+        },
+        "sidebar-text-active-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-text-hover-bg": {
+          "$type": "color",
+          "$value": "#2A58BA"
+        },
+        "sidebar-unread-text": {
+          "$type": "color",
+          "$value": "sidebar-text"
         }
       }
     }

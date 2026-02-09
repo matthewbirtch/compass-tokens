@@ -3,75 +3,173 @@
   "color": {
     "theme": {
       "denim": {
-        "center-channel-bg": {
+        "away-indicator": {
           "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "center-channel-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.900}"
-        },
-        "sidebar-bg": {
-          "$type": "color",
-          "$value": "{color.foundation.indigo.500}"
-        },
-        "sidebar-header-bg": {
-          "$type": "color",
-          "$value": "#192A4D",
-          "$description": "Custom value between indigo shades"
-        },
-        "sidebar-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-text-hover-bg": {
-          "$type": "color",
-          "$value": "{color.foundation.indigo.400}"
-        },
-        "sidebar-header-text-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-unread-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-text-active-border": {
-          "$type": "color",
-          "$value": "{color.foundation.blue.300}"
-        },
-        "sidebar-text-active-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "sidebar-team-background": {
-          "$type": "color",
-          "$value": "#162545",
-          "$description": "Custom value darker than indigo-600"
-        },
-        "link-color": {
-          "$type": "color",
-          "$value": "{color.foundation.blue.500}"
+          "$value": "{color.foundation.yellow.500}"
         },
         "button-bg": {
           "$type": "color",
           "$value": "{color.foundation.blue.500}"
         },
+        "button-bg-12": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
+        "button-bg-16": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
+        "button-bg-4": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
+        "button-bg-8": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
         "button-color": {
           "$type": "color",
           "$value": "{color.foundation.neutral.0}"
         },
-        "online-indicator": {
+        "button-color-12": {
           "$type": "color",
-          "$value": "{color.foundation.green.500}"
+          "$value": "#FFFFFF"
         },
-        "away-indicator": {
+        "button-color-16": {
           "$type": "color",
-          "$value": "{color.foundation.yellow.500}"
+          "$value": "#FFFFFF"
+        },
+        "button-color-24": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "button-color-8": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "calls-bg": {
+          "$type": "color",
+          "$value": "#14213E"
+        },
+        "center-channel-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "center-channel-bg-12": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-16": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-24": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-32": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-64": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-75": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-8": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-80": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.900}"
+        },
+        "center-channel-color-12": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-16": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-24": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-32": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-4": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-40": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-48": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-56": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-64": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-75": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-8": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-80": {
+          "$type": "color",
+          "$value": "#3F4350"
         },
         "dnd-indicator": {
           "$type": "color",
           "$value": "{color.foundation.red.400}"
+        },
+        "error-text": {
+          "$type": "color",
+          "$value": "{color.foundation.red.400}"
+        },
+        "error-text-12": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-16": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-24": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-4": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-8": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "link-color": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.600}"
         },
         "mention-bg": {
           "$type": "color",
@@ -79,27 +177,99 @@
         },
         "mention-color": {
           "$type": "color",
-          "$value": "{color.foundation.indigo.500}"
+          "$value": "sidebar-bg"
         },
         "mention-highlight-bg": {
           "$type": "color",
           "$value": "{color.foundation.yellow.200}"
         },
+        "mention-highlight-bg-32": {
+          "$type": "color",
+          "$value": "#FFD470"
+        },
         "mention-highlight-link": {
           "$type": "color",
           "$value": "{color.foundation.neutral.1100}"
-        },
-        "error-text": {
-          "$type": "color",
-          "$value": "{color.foundation.red.400}"
         },
         "new-message-separator": {
           "$type": "color",
           "$value": "{color.foundation.yellow.600}"
         },
-        "calls-bg": {
+        "online-indicator": {
           "$type": "color",
-          "$value": "{color.foundation.indigo.600}"
+          "$value": "{color.foundation.green.500}"
+        },
+        "sidebar-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.indigo.500}"
+        },
+        "sidebar-header-bg": {
+          "$type": "color",
+          "$value": "#192A4D"
+        },
+        "sidebar-header-text-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-team-background": {
+          "$type": "color",
+          "$value": "#162545"
+        },
+        "sidebar-text": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "sidebar-text-12": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-16": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-24": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-32": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-56": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-64": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-75": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-8": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-80": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "sidebar-text-active-border": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.300}"
+        },
+        "sidebar-text-active-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-text-hover-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.indigo.400}"
+        },
+        "sidebar-unread-text": {
+          "$type": "color",
+          "$value": "sidebar-text"
         }
       }
     }

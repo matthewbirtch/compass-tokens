@@ -3,80 +3,177 @@
   "color": {
     "theme": {
       "quartz": {
-        "center-channel-bg": {
+        "away-indicator": {
           "$type": "color",
-          "$value": "{color.foundation.neutral.0}"
-        },
-        "center-channel-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.900}"
-        },
-        "sidebar-bg": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.50}"
-        },
-        "sidebar-header-bg": {
-          "$type": "color",
-          "$value": "#EBECEF",
-          "$description": "Custom light gray value"
-        },
-        "sidebar-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.1100}"
-        },
-        "sidebar-text-hover-bg": {
-          "$type": "color",
-          "$value": "#E8EAED",
-          "$description": "Custom light hover value"
-        },
-        "sidebar-header-text-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.1100}"
-        },
-        "sidebar-unread-text": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.1100}"
-        },
-        "sidebar-text-active-border": {
-          "$type": "color",
-          "$value": "{color.foundation.cyan.500}"
-        },
-        "sidebar-text-active-color": {
-          "$type": "color",
-          "$value": "{color.foundation.neutral.1100}"
-        },
-        "sidebar-team-background": {
-          "$type": "color",
-          "$value": "#E5E7EB",
-          "$description": "Custom light team background"
-        },
-        "link-color": {
-          "$type": "color",
-          "$value": "{color.foundation.blue.600}"
+          "$value": "{color.foundation.yellow.500}"
         },
         "button-bg": {
           "$type": "color",
           "$value": "{color.foundation.blue.500}"
         },
+        "button-bg-12": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
+        "button-bg-16": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
+        "button-bg-4": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
+        "button-bg-8": {
+          "$type": "color",
+          "$value": "#1C58D9"
+        },
         "button-color": {
           "$type": "color",
           "$value": "{color.foundation.neutral.0}"
         },
-        "online-indicator": {
+        "button-color-12": {
           "$type": "color",
-          "$value": "{color.foundation.green.500}"
+          "$value": "#FFFFFF"
         },
-        "away-indicator": {
+        "button-color-16": {
           "$type": "color",
-          "$value": "{color.foundation.yellow.500}"
+          "$value": "#FFFFFF"
+        },
+        "button-color-24": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "button-color-8": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "calls-bg": {
+          "$type": "color",
+          "$value": "#24272E"
+        },
+        "center-channel-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.0}"
+        },
+        "center-channel-bg-12": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-16": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-24": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-32": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-64": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-75": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-8": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-bg-80": {
+          "$type": "color",
+          "$value": "#FFFFFF"
+        },
+        "center-channel-color": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.900}"
+        },
+        "center-channel-color-12": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-16": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-24": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-32": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-4": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-40": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-48": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-56": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-64": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-75": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-8": {
+          "$type": "color",
+          "$value": "#3F4350"
+        },
+        "center-channel-color-80": {
+          "$type": "color",
+          "$value": "#3F4350"
         },
         "dnd-indicator": {
           "$type": "color",
           "$value": "{color.foundation.red.400}"
         },
+        "error-text": {
+          "$type": "color",
+          "$value": "{color.foundation.red.400}"
+        },
+        "error-text-12": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-16": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-24": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-4": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "error-text-8": {
+          "$type": "color",
+          "$value": "#D24B4E"
+        },
+        "link-color": {
+          "$type": "color",
+          "$value": "{color.foundation.blue.600}"
+        },
         "mention-bg": {
           "$type": "color",
-          "$value": "{color.foundation.blue.500}"
+          "$value": "button-bg"
         },
         "mention-color": {
           "$type": "color",
@@ -86,22 +183,93 @@
           "$type": "color",
           "$value": "{color.foundation.teal.200}"
         },
+        "mention-highlight-bg-32": {
+          "$type": "color",
+          "$value": "#7FF0F0"
+        },
         "mention-highlight-link": {
           "$type": "color",
           "$value": "{color.foundation.teal.800}"
-        },
-        "error-text": {
-          "$type": "color",
-          "$value": "{color.foundation.red.400}"
         },
         "new-message-separator": {
           "$type": "color",
           "$value": "{color.foundation.teal.600}"
         },
-        "calls-bg": {
+        "online-indicator": {
           "$type": "color",
-          "$value": "#24272E",
-          "$description": "Custom dark calls background"
+          "$value": "{color.foundation.green.500}"
+        },
+        "sidebar-bg": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.50}"
+        },
+        "sidebar-header-bg": {
+          "$type": "color",
+          "$value": "#EBECEF"
+        },
+        "sidebar-header-text-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-team-background": {
+          "$type": "color",
+          "$value": "#E5E7EB"
+        },
+        "sidebar-text": {
+          "$type": "color",
+          "$value": "{color.foundation.neutral.1100}"
+        },
+        "sidebar-text-12": {
+          "$type": "color",
+          "$value": "#1B1D22"
+        },
+        "sidebar-text-16": {
+          "$type": "color",
+          "$value": "#1B1D22"
+        },
+        "sidebar-text-24": {
+          "$type": "color",
+          "$value": "#1B1D22"
+        },
+        "sidebar-text-32": {
+          "$type": "color",
+          "$value": "#1B1D22"
+        },
+        "sidebar-text-56": {
+          "$type": "color",
+          "$value": "#1B1D22"
+        },
+        "sidebar-text-64": {
+          "$type": "color",
+          "$value": "#1B1D22"
+        },
+        "sidebar-text-75": {
+          "$type": "color",
+          "$value": "#1B1D22"
+        },
+        "sidebar-text-8": {
+          "$type": "color",
+          "$value": "#1B1D22"
+        },
+        "sidebar-text-80": {
+          "$type": "color",
+          "$value": "#1B1D22"
+        },
+        "sidebar-text-active-border": {
+          "$type": "color",
+          "$value": "{color.foundation.cyan.500}"
+        },
+        "sidebar-text-active-color": {
+          "$type": "color",
+          "$value": "sidebar-text"
+        },
+        "sidebar-text-hover-bg": {
+          "$type": "color",
+          "$value": "#E8EAED"
+        },
+        "sidebar-unread-text": {
+          "$type": "color",
+          "$value": "sidebar-text"
         }
       }
     }
