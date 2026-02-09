@@ -358,18 +358,18 @@ function buildFoundationTypographyTokens(variables: Variable[]): any {
       }
     } else if (property === 'lineHeight') {
       // Handle line height (FLOAT type)
-      // Use the actual line height value as the key, not the variable name number
+      // Use the scale value from variable name (matching fontSize pattern)
       if (typeof varValue === 'number') {
-        const lineHeightKey = String(varValue);
+        // Use 'value' which is the scale number from the variable name (e.g., "200" from "line-height/body/200")
         // Only add if not already present (avoid duplicates from heading/body variants)
-        if (!tokens.typography.foundation.lineHeight[lineHeightKey]) {
-          tokens.typography.foundation.lineHeight[lineHeightKey] = {
+        if (!tokens.typography.foundation.lineHeight[value]) {
+          tokens.typography.foundation.lineHeight[value] = {
             $type: "dimension",
             $value: varValue
           };
-          console.log(`  ✓ Added lineHeight ${lineHeightKey}`);
+          console.log(`  ✓ Added lineHeight ${value} with value ${varValue}`);
         } else {
-          console.log(`  ⚠️ LineHeight ${lineHeightKey} already exists, skipping`);
+          console.log(`  ⚠️ LineHeight ${value} already exists, skipping`);
         }
       }
     } else if (property === 'letterSpacing') {

@@ -109,50 +109,57 @@
         }
       },
       "lineHeight": {
-        "16": {
+        "25": {
           "$type": "dimension",
-          "$value": 16,
-          "$description": "Extra tight line height (16px)"
+          "$value": 16
         },
-        "20": {
+        "50": {
           "$type": "dimension",
-          "$value": 20,
-          "$description": "Tight line height (20px)"
+          "$value": 16
         },
-        "24": {
+        "75": {
           "$type": "dimension",
-          "$value": 24,
-          "$description": "Normal line height (24px)"
+          "$value": 16
         },
-        "28": {
+        "100": {
           "$type": "dimension",
-          "$value": 28,
-          "$description": "Relaxed line height (28px)"
+          "$value": 20
         },
-        "30": {
+        "200": {
           "$type": "dimension",
-          "$value": 30,
-          "$description": "Relaxed line height (30px)"
+          "$value": 24
         },
-        "36": {
+        "300": {
           "$type": "dimension",
-          "$value": 36,
-          "$description": "Loose line height (36px)"
+          "$value": 24
         },
-        "40": {
+        "400": {
           "$type": "dimension",
-          "$value": 40,
-          "$description": "Extra loose line height (40px)"
+          "$value": 28
         },
-        "44": {
+        "500": {
           "$type": "dimension",
-          "$value": 44,
-          "$description": "Extra loose line height (44px)"
+          "$value": 28
         },
-        "48": {
+        "600": {
           "$type": "dimension",
-          "$value": 48,
-          "$description": "Extra loose line height (48px)"
+          "$value": 30
+        },
+        "700": {
+          "$type": "dimension",
+          "$value": 36
+        },
+        "800": {
+          "$type": "dimension",
+          "$value": 40
+        },
+        "900": {
+          "$type": "dimension",
+          "$value": 44
+        },
+        "1000": {
+          "$type": "dimension",
+          "$value": 48
         }
       }
     }
