@@ -269,15 +269,15 @@ function parseSemanticTypographyName(name: string): { category: string; size: st
   const size = match[2];
   const variantRaw = match[3];
   
+  // Skip "All Caps" variants - they're identical to base tokens since DTCG doesn't support text-transform
+  if (variantRaw === 'All Caps') {
+    return null;
+  }
+  
   let variant: string | undefined;
   if (variantRaw) {
-    // Normalize variant names
-    if (variantRaw === 'All Caps') {
-      variant = 'allCaps';
-    } else {
-      // Convert "Semibold", "Regular", "Light", "Bold" to lowercase
-      variant = variantRaw.toLowerCase();
-    }
+    // Convert "Semibold", "Regular", "Light", "Bold" to lowercase
+    variant = variantRaw.toLowerCase();
   }
   
   return {
