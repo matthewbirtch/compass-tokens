@@ -555,7 +555,7 @@ async function extractThemeTokens() {
     if (!themeCollections.has(variable.variableCollectionId)) continue;
     
     // Skip opacity variants (e.g., sidebar-bg-64, button-color-80)
-    if (/-(8|16|24|32|40|48|56|64|72|80|88|96)$/.test(variable.name)) {
+    if (/-(4|8|12|16|20|24|32|40|48|56|64|72|80|88|96)$/.test(variable.name)) {
       console.log(`Skipping opacity variant: "${variable.name}"`);
       continue;
     }
@@ -590,6 +590,13 @@ async function extractThemeTokens() {
       if (typeof value === 'object' && 'type' in value && value.type === 'VARIABLE_ALIAS') {
         const aliasedVariable = await figma.variables.getVariableByIdAsync(value.id);
         if (aliasedVariable) {
+          // Skip if the aliased variable has an opacity suffix
+          if (/-(4|8|12|16|20|24|32|40|48|56|64|72|80|88|96)$/.test(aliasedVariable.name)) {
+            console.log(`  ${modeName}: Skipping "${variable.name}" → alias to opacity variant "${aliasedVariable.name}"`);
+            stats.skipped++;
+            continue;
+          }
+          
           tokenValue = buildReference(aliasedVariable.name);
           console.log(`  ${modeName}: ${variable.name} → ${tokenValue}`);
         } else {
@@ -599,6 +606,14 @@ async function extractThemeTokens() {
       } else if (typeof value === 'object' && 'r' in value) {
         // Direct color value
         const rgba = value as RGBA;
+        
+        // Skip colors with opacity < 1.0 (opacity should be handled in transformation)
+        if (rgba.a < 1.0) {
+          console.log(`  ${modeName}: Skipping "${variable.name}" with opacity ${rgba.a}`);
+          stats.skipped++;
+          continue;
+        }
+        
         tokenValue = rgbToHex(rgba);
         console.log(`  ${modeName}: ${variable.name} → ${tokenValue}`);
       } else {
