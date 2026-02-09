@@ -9,24 +9,42 @@ const GITHUB_REPO = 'matthewbirtch/compass-tokens';
 // Token file paths
 const TOKEN_FILES = {
   FOUNDATION_COLOR: 'tokens/src/foundation/color.json',
-  SEMANTIC_ATTACHMENT: 'tokens/src/semantic/attachment.json'
+  SEMANTIC_ATTACHMENT: 'tokens/src/semantic/attachment.json',
+  FOUNDATION_RADIUS: 'tokens/src/foundation/radius.json'
 };
 
 // Token patterns
 const FOUNDATION_COLOR_PATTERN = /^(blue|indigo|neutral|cyan|purple|teal|yellow|orange|green|red)\/\d+$/;
 const SEMANTIC_ATTACHMENT_PATTERN = /^attachment\/(blue|green|orange|red|grey)$/;
+const FOUNDATION_RADIUS_PATTERN = /^radius-(xs|s|m|l|xl|full)$/;
 
 // Token category definitions
 interface TokenCategory {
   type: string;
   path: string;
   pattern: RegExp;
+  variableType: 'COLOR' | 'FLOAT';
 }
 
 const TOKEN_CATEGORIES: TokenCategory[] = [
-  { type: 'foundation-color', path: TOKEN_FILES.FOUNDATION_COLOR, pattern: FOUNDATION_COLOR_PATTERN },
-  { type: 'semantic-attachment', path: TOKEN_FILES.SEMANTIC_ATTACHMENT, pattern: SEMANTIC_ATTACHMENT_PATTERN }
+  { type: 'foundation-color', path: TOKEN_FILES.FOUNDATION_COLOR, pattern: FOUNDATION_COLOR_PATTERN, variableType: 'COLOR' },
+  { type: 'semantic-attachment', path: TOKEN_FILES.SEMANTIC_ATTACHMENT, pattern: SEMANTIC_ATTACHMENT_PATTERN, variableType: 'COLOR' },
+  { type: 'foundation-radius', path: TOKEN_FILES.FOUNDATION_RADIUS, pattern: FOUNDATION_RADIUS_PATTERN, variableType: 'FLOAT' }
 ];
+
+// File configuration interface
+interface FileConfig {
+  fileId: string;
+  fileName: string;
+  tokenTypes: string[];
+}
+
+// Storage keys
+const STORAGE_KEYS = {
+  GITHUB_TOKEN: 'github-token',
+  LAST_SYNC: 'last-sync',
+  FILE_CONFIGS: 'file-configs'
+};
 
 // Show UI
 figma.showUI(__html__, {
@@ -51,11 +69,11 @@ async function initialize() {
 }
 
 /**
- * Categorize a variable by its naming pattern
+ * Categorize a variable by its naming pattern and type
  */
-function categorizeVariable(name: string): TokenCategory | null {
+function categorizeVariable(name: string, resolvedType: string): TokenCategory | null {
   for (const category of TOKEN_CATEGORIES) {
-    if (category.pattern.test(name)) {
+    if (category.pattern.test(name) && category.variableType === resolvedType) {
       return category;
     }
   }
@@ -98,6 +116,18 @@ function parseFoundationColorName(name: string): { family: string; shade: string
   return {
     family: match[1].toLowerCase(),
     shade: match[2]
+  };
+}
+
+/**
+ * Parse foundation radius variable name
+ */
+function parseFoundationRadiusName(name: string): { size: string } | null {
+  const match = name.match(/^radius-([a-z]+)$/i);
+  if (!match) return null;
+  
+  return {
+    size: match[1].toLowerCase()
   };
 }
 
@@ -153,7 +183,9 @@ function buildReference(variableName: string): string {
  * Extract and transform all supported tokens from Figma
  */
 async function extractAllTokens() {
+  // Fetch all variable types
   const colorVariables = await figma.variables.getLocalVariablesAsync('COLOR');
+  const floatVariables = await figma.variables.getLocalVariablesAsync('FLOAT');
   
   // Initialize token structures
   const foundationColorTokens: any = {
@@ -172,16 +204,24 @@ async function extractAllTokens() {
     }
   };
 
+  const foundationRadiusTokens: any = {
+    $schema: "https://tr.designtokens.org/format/",
+    radius: {
+      foundation: {}
+    }
+  };
+
   const stats = {
     foundationColors: { processed: 0, skipped: 0 },
     semanticAttachment: { processed: 0, skipped: 0 },
+    foundationRadius: { processed: 0, skipped: 0 },
     total: { processed: 0, skipped: 0 }
   };
 
   // Process all color variables
   for (const variable of colorVariables) {
-    console.log(`Processing variable: "${variable.name}"`);
-    const category = categorizeVariable(variable.name);
+    console.log(`Processing COLOR variable: "${variable.name}"`);
+    const category = categorizeVariable(variable.name, 'COLOR');
     
     if (!category) {
       console.log(`  ❌ Skipped (no matching category)`);
@@ -286,10 +326,87 @@ async function extractAllTokens() {
     }
   }
 
+  // Process all float variables (radius, spacing, etc.)
+  for (const variable of floatVariables) {
+    console.log(`Processing FLOAT variable: "${variable.name}"`);
+    const category = categorizeVariable(variable.name, 'FLOAT');
+    
+    if (!category) {
+      console.log(`  ❌ Skipped (no matching category)`);
+      stats.total.skipped++;
+      continue;
+    }
+    
+    console.log(`  ✓ Categorized as: ${category.type}`);
+
+    if (category.type === 'foundation-radius') {
+      const parsed = parseFoundationRadiusName(variable.name);
+      if (!parsed) {
+        console.log(`  ❌ Failed to parse radius name`);
+        stats.foundationRadius.skipped++;
+        stats.total.skipped++;
+        continue;
+      }
+
+      const { size } = parsed;
+      console.log(`  Parsed size: ${size}`);
+      
+      // Get the first mode's value
+      const modeId = Object.keys(variable.valuesByMode)[0];
+      const value = variable.valuesByMode[modeId];
+      
+      if (typeof value === 'number') {
+        console.log(`  ✓ Numeric value: ${value}`);
+        
+        // Add token
+        foundationRadiusTokens.radius.foundation[size] = {
+          $type: "dimension",
+          $value: value
+        };
+        
+        stats.foundationRadius.processed++;
+        stats.total.processed++;
+      } else if (typeof value === 'string') {
+        // Handle percentage values
+        console.log(`  ✓ String value: ${value}`);
+        foundationRadiusTokens.radius.foundation[size] = {
+          $type: "dimension",
+          $value: value
+        };
+        
+        stats.foundationRadius.processed++;
+        stats.total.processed++;
+      } else {
+        console.log(`  ❌ Unknown value type: ${typeof value}`);
+        stats.foundationRadius.skipped++;
+        stats.total.skipped++;
+      }
+    }
+  }
+
+  // Sort radius tokens alphabetically and add full token
+  const sortedRadius: any = {};
+  const radiusSizes = ['xs', 's', 'm', 'l', 'xl', 'full'];
+  radiusSizes.forEach(size => {
+    if (foundationRadiusTokens.radius.foundation[size]) {
+      sortedRadius[size] = foundationRadiusTokens.radius.foundation[size];
+    }
+  });
+  // Add full token if not present (Figma limitation workaround)
+  if (!sortedRadius['full']) {
+    sortedRadius['full'] = {
+      $type: "dimension",
+      $value: "50%",
+      $description: "Full radius - circular elements, pills, fully rounded buttons"
+    };
+  }
+  foundationRadiusTokens.radius.foundation = sortedRadius;
+
   return {
     tokens: {
       [TOKEN_FILES.FOUNDATION_COLOR]: foundationColorTokens,
-      [TOKEN_FILES.SEMANTIC_ATTACHMENT]: semanticAttachmentTokens
+      [TOKEN_FILES.SEMANTIC_ATTACHMENT]: semanticAttachmentTokens,
+      [TOKEN_FILES.FOUNDATION_RADIUS]: foundationRadiusTokens
     },
     stats: {
       ...stats,
@@ -401,21 +518,91 @@ function validateSemanticTokens(tokens: any): { valid: boolean; errors: string[]
 }
 
 /**
+ * Validate foundation radius tokens
+ */
+function validateRadiusTokens(tokens: any): { valid: boolean; errors: string[]; warnings: string[] } {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Check structure
+  if (!tokens.$schema) {
+    warnings.push('Radius: Missing $schema field');
+  }
+
+  if (!tokens.radius || !tokens.radius.foundation) {
+    errors.push('Radius: Invalid token structure');
+    return { valid: false, errors, warnings };
+  }
+
+  const foundation = tokens.radius.foundation;
+  const expectedSizes = ['xs', 's', 'm', 'l', 'xl', 'full'];
+  
+  // Validate each radius size
+  Object.entries(foundation).forEach(([size, token]: [string, any]) => {
+    // Check required fields
+    if (!token.$type || token.$type !== 'dimension') {
+      errors.push(`Radius ${size}: Invalid or missing $type (expected "dimension")`);
+    }
+
+    if (token.$value === undefined || token.$value === null) {
+      errors.push(`Radius ${size}: Missing $value`);
+    } else {
+      // Validate value is number or "50%"
+      const isNumber = typeof token.$value === 'number';
+      const isPercentage = token.$value === '50%';
+      
+      if (!isNumber && !isPercentage) {
+        errors.push(`Radius ${size}: Value must be a number or "50%" for full radius`);
+      }
+      
+      // Special validation for "full"
+      if (size === 'full' && token.$value !== '50%') {
+        warnings.push(`Radius full: Expected "50%" but got ${token.$value}`);
+      }
+    }
+  });
+
+  // Check for missing expected sizes
+  expectedSizes.forEach(size => {
+    if (!foundation[size]) {
+      warnings.push(`Radius: Missing expected size "${size}"`);
+    }
+  });
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+/**
  * Validate all token types
  */
 function validateAllTokens(tokensMap: any): { valid: boolean; errors: string[]; warnings: string[] } {
   const allErrors: string[] = [];
   const allWarnings: string[] = [];
 
-  // Validate foundation colors
-  const foundationValidation = validateFoundationTokens(tokensMap[TOKEN_FILES.FOUNDATION_COLOR]);
-  allErrors.push(...foundationValidation.errors);
-  allWarnings.push(...foundationValidation.warnings);
+  // Validate foundation colors (if present)
+  if (tokensMap[TOKEN_FILES.FOUNDATION_COLOR]) {
+    const foundationValidation = validateFoundationTokens(tokensMap[TOKEN_FILES.FOUNDATION_COLOR]);
+    allErrors.push(...foundationValidation.errors);
+    allWarnings.push(...foundationValidation.warnings);
+  }
 
-  // Validate semantic attachment
-  const semanticValidation = validateSemanticTokens(tokensMap[TOKEN_FILES.SEMANTIC_ATTACHMENT]);
-  allErrors.push(...semanticValidation.errors);
-  allWarnings.push(...semanticValidation.warnings);
+  // Validate semantic attachment (if present)
+  if (tokensMap[TOKEN_FILES.SEMANTIC_ATTACHMENT]) {
+    const semanticValidation = validateSemanticTokens(tokensMap[TOKEN_FILES.SEMANTIC_ATTACHMENT]);
+    allErrors.push(...semanticValidation.errors);
+    allWarnings.push(...semanticValidation.warnings);
+  }
+
+  // Validate radius (if present)
+  if (tokensMap[TOKEN_FILES.FOUNDATION_RADIUS]) {
+    const radiusValidation = validateRadiusTokens(tokensMap[TOKEN_FILES.FOUNDATION_RADIUS]);
+    allErrors.push(...radiusValidation.errors);
+    allWarnings.push(...radiusValidation.warnings);
+  }
 
   return {
     valid: allErrors.length === 0,
@@ -451,17 +638,36 @@ async function fetchCurrentTokensFromFile(githubToken: string, filePath: string)
 async function fetchAllCurrentTokens(githubToken: string): Promise<any> {
   const tokens: any = {};
   
-  // Fetch foundation colors
-  tokens[TOKEN_FILES.FOUNDATION_COLOR] = await fetchCurrentTokensFromFile(
-    githubToken, 
-    TOKEN_FILES.FOUNDATION_COLOR
-  );
+  // Try to fetch each file, but don't fail if file doesn't exist
+  try {
+    tokens[TOKEN_FILES.FOUNDATION_COLOR] = await fetchCurrentTokensFromFile(
+      githubToken, 
+      TOKEN_FILES.FOUNDATION_COLOR
+    );
+  } catch (e) {
+    console.log('Foundation colors not found in repo (may be new file)');
+    tokens[TOKEN_FILES.FOUNDATION_COLOR] = { color: { foundation: {} } };
+  }
   
-  // Fetch semantic attachment
-  tokens[TOKEN_FILES.SEMANTIC_ATTACHMENT] = await fetchCurrentTokensFromFile(
-    githubToken, 
-    TOKEN_FILES.SEMANTIC_ATTACHMENT
-  );
+  try {
+    tokens[TOKEN_FILES.SEMANTIC_ATTACHMENT] = await fetchCurrentTokensFromFile(
+      githubToken, 
+      TOKEN_FILES.SEMANTIC_ATTACHMENT
+    );
+  } catch (e) {
+    console.log('Semantic attachment not found in repo (may be new file)');
+    tokens[TOKEN_FILES.SEMANTIC_ATTACHMENT] = { color: { semantic: { attachment: {} } } };
+  }
+  
+  try {
+    tokens[TOKEN_FILES.FOUNDATION_RADIUS] = await fetchCurrentTokensFromFile(
+      githubToken, 
+      TOKEN_FILES.FOUNDATION_RADIUS
+    );
+  } catch (e) {
+    console.log('Foundation radius not found in repo (may be new file)');
+    tokens[TOKEN_FILES.FOUNDATION_RADIUS] = { radius: { foundation: {} } };
+  }
   
   return tokens;
 }
@@ -537,26 +743,71 @@ function hasSemanticAttachmentChanges(newTokens: any, currentTokens: any): boole
 }
 
 /**
+ * Compare foundation radius tokens for differences
+ */
+function hasFoundationRadiusChanges(newTokens: any, currentTokens: any): boolean {
+  const newRadius = (newTokens.radius && newTokens.radius.foundation) ? newTokens.radius.foundation : {};
+  const currentRadius = (currentTokens.radius && currentTokens.radius.foundation) ? currentTokens.radius.foundation : {};
+  
+  // Get all sizes from both
+  const allSizes = new Set([
+    ...Object.keys(newRadius),
+    ...Object.keys(currentRadius)
+  ]);
+  
+  // Check each size
+  for (const size of allSizes) {
+    const newValue = newRadius[size] ? newRadius[size].$value : undefined;
+    const currentValue = currentRadius[size] ? currentRadius[size].$value : undefined;
+    
+    // If values differ (or one is missing), we have changes
+    if (newValue !== currentValue) {
+      console.log(`Radius change: ${size}: ${currentValue} → ${newValue}`);
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+/**
  * Compare all token types for differences
  * Returns object with file paths that have changes
  */
 function detectChanges(newTokensMap: any, currentTokensMap: any): { hasChanges: boolean; changedFiles: string[] } {
   const changedFiles: string[] = [];
   
-  // Check foundation colors
-  if (hasFoundationColorChanges(
-    newTokensMap[TOKEN_FILES.FOUNDATION_COLOR], 
-    currentTokensMap[TOKEN_FILES.FOUNDATION_COLOR]
-  )) {
-    changedFiles.push(TOKEN_FILES.FOUNDATION_COLOR);
+  // Check foundation colors (if present in new tokens)
+  if (newTokensMap[TOKEN_FILES.FOUNDATION_COLOR] && 
+      Object.keys(newTokensMap[TOKEN_FILES.FOUNDATION_COLOR].color.foundation).length > 0) {
+    if (hasFoundationColorChanges(
+      newTokensMap[TOKEN_FILES.FOUNDATION_COLOR], 
+      currentTokensMap[TOKEN_FILES.FOUNDATION_COLOR]
+    )) {
+      changedFiles.push(TOKEN_FILES.FOUNDATION_COLOR);
+    }
   }
   
-  // Check semantic attachment
-  if (hasSemanticAttachmentChanges(
-    newTokensMap[TOKEN_FILES.SEMANTIC_ATTACHMENT], 
-    currentTokensMap[TOKEN_FILES.SEMANTIC_ATTACHMENT]
-  )) {
-    changedFiles.push(TOKEN_FILES.SEMANTIC_ATTACHMENT);
+  // Check semantic attachment (if present in new tokens)
+  if (newTokensMap[TOKEN_FILES.SEMANTIC_ATTACHMENT] && 
+      Object.keys(newTokensMap[TOKEN_FILES.SEMANTIC_ATTACHMENT].color.semantic.attachment).length > 0) {
+    if (hasSemanticAttachmentChanges(
+      newTokensMap[TOKEN_FILES.SEMANTIC_ATTACHMENT], 
+      currentTokensMap[TOKEN_FILES.SEMANTIC_ATTACHMENT]
+    )) {
+      changedFiles.push(TOKEN_FILES.SEMANTIC_ATTACHMENT);
+    }
+  }
+  
+  // Check radius (if present in new tokens)
+  if (newTokensMap[TOKEN_FILES.FOUNDATION_RADIUS] && 
+      Object.keys(newTokensMap[TOKEN_FILES.FOUNDATION_RADIUS].radius.foundation).length > 0) {
+    if (hasFoundationRadiusChanges(
+      newTokensMap[TOKEN_FILES.FOUNDATION_RADIUS], 
+      currentTokensMap[TOKEN_FILES.FOUNDATION_RADIUS]
+    )) {
+      changedFiles.push(TOKEN_FILES.FOUNDATION_RADIUS);
+    }
   }
   
   if (changedFiles.length === 0) {

@@ -228,11 +228,14 @@
           const totalTokens = msg.data.total.processed;
           const foundationCount = msg.data.foundationColors.processed;
           const semanticCount = msg.data.semanticAttachment.processed;
+          const radiusCount = msg.data.foundationRadius ? msg.data.foundationRadius.processed : 0;
           
-          showProgress(
-            'Tokens extracted!',
-            `Foundation colors: ${foundationCount} | Semantic attachment: ${semanticCount} | Total: ${totalTokens}`
-          );
+          let details = `Foundation colors: ${foundationCount}`;
+          if (semanticCount > 0) details += ` | Semantic attachment: ${semanticCount}`;
+          if (radiusCount > 0) details += ` | Radius: ${radiusCount}`;
+          details += ` | Total: ${totalTokens}`;
+          
+          showProgress('Tokens extracted!', details);
           break;
         
         case 'sync-success':
