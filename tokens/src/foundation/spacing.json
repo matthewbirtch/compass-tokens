@@ -4,43 +4,35 @@
     "foundation": {
       "xxxxs": {
         "$type": "dimension",
-        "$value": 4,
-        "$description": "Extra extra extra extra small spacing (4px)"
+        "$value": 2
       },
       "xs": {
         "$type": "dimension",
-        "$value": 8,
-        "$description": "Extra small spacing (8px)"
+        "$value": 8
       },
       "m": {
         "$type": "dimension",
-        "$value": 12,
-        "$description": "Medium spacing (12px)"
+        "$value": 12
       },
       "l": {
         "$type": "dimension",
-        "$value": 16,
-        "$description": "Large spacing (16px)"
+        "$value": 16
       },
       "xl": {
         "$type": "dimension",
-        "$value": 20,
-        "$description": "Extra large spacing (20px)"
+        "$value": 20
       },
       "xxl": {
         "$type": "dimension",
-        "$value": 24,
-        "$description": "Extra extra large spacing (24px)"
+        "$value": 24
       },
       "xxxl": {
         "$type": "dimension",
-        "$value": 32,
-        "$description": "Extra extra extra large spacing (32px)"
+        "$value": 32
       },
       "xxxxl": {
         "$type": "dimension",
-        "$value": 40,
-        "$description": "Extra extra extra extra large spacing (40px)"
+        "$value": 40
       }
     }
   }
