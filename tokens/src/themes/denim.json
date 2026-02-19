@@ -69,7 +69,7 @@
         },
         "sidebar-header-bg": {
           "$type": "color",
-          "$value": "#192A4D"
+          "$value": "#29194D"
         },
         "sidebar-header-text-color": {
           "$type": "color",
